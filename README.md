@@ -61,3 +61,28 @@
 * `NaN` also is a missing value
 * Has own `class` attribute so `NA` for `integer` can be different than for `character`
 * `is.na/1` or `is.nan/1` checks - as return `TRUE | FALSE`
+* Missing values can be removed (filtered) by `complete.cases(data source)`
+
+### Filters
+* With `[logical query]` or `[num]` we can filter vectors
+* With `[[field name]]` is possible to select element from lists, we can use variables
+* `$` can be used to fetch field by name, can't use here variables - only character name
+* For matrix we can use `[index_X, index_Y]` to select single value. When we decide to ignore `index_X` or `index_Y` will receive whole rows / columns.
+
+For `$` and `[[` we can use partial match but always we must receive at most one record.
+
+### Loop, if
+* `if { ... }`
+* `for(var in source) { ... }`
+* `while(check) { ... }`
+* `repeat { ... }` - `do-while`, we need use `break` to stop it manually
+* `next` - skip iteration, `continue` meaning
+* `return()` to exit value, this is a function!
+
+### Functions
+* `function(parameters) { ... }` - we can ignore parameters which are not used in function's body (for example - `function(a, b) { a }` - `b` can be ignored in function's call)
+
+### Debugging
+* `traceback` - call stack
+* `debug` - mark function to inspection
+* `browser` - pause execution and switching to debug mode

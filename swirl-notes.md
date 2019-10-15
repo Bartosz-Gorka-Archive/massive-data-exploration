@@ -28,7 +28,7 @@
 * Default parameter in function - `function(x, y = value) { ... }`
 * Function can use function - `function(fun, data) { fun(data) }`
 * Anonymous function - `f(function(x){ x + 1 }, 6)`
-* `...` can be used in code just as `...` - for example `fun(...) { paste(...) }`
+* `...` can be used in code just as `...` - for example `fun(...) { paste(...) }`. After `...` we MUST use named parameters
 * Take args from `...` - `args <- list(...)`, next we can use names `args[['name']]`
 * Binary operator `"%name$" <- function(left, right) { ... }` - always two args, name inside `"% %"`
 * Dates can by represented by the `POSIXct` and `POSIXlt` classes, internally dates and times are stored as number of seconds since `1970-01-01`
