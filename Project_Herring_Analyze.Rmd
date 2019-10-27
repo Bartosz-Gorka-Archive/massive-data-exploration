@@ -3,15 +3,64 @@ title: "Eksploracja Masywnych Danych - Analiza danych"
 author: "Kajetan Zimniak & Bartosz Górka"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
+  pdf_document: 
+    toc: true
   html_document:
     toc: true
     df_print: paged
-  pdf_document: 
-    toc: true
 ---
 ```{r setup, include=FALSE}
 
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Podsumowanie
+# Podsumowanie analizy
+TODO
+
+# Wykorzystane biblioteki
+* `knitr`
+* `dplyr`
+* `tidyverse`
+
+# Ustawienie ziarna generatora
+Celem zapewnienia powtarzalności operacji losowania, a co za tym idzie powtarzalności wyników przy każdym uruchomieniu raportu na tych samych danych zastosowano ziarno generatora o wartości `102019`.
+
+```{r ziarno-losowosci}
+set.seed(102019)
+```
+
+# Wczytanie danych z pliku
+Dane zamieszczone na stronie przedmiotu w postaci pliku CSV pobieramy wyłącznie w sytuacji braku pliku w katalogu roboczym. Pozwala to nam na ograniczenie niepotrzebnego transferu danych, jeżeli plik już istnieje.
+```{r pobranie danych}
+file_name = "sledzie.csv"
+source_url = "http://www.cs.put.poznan.pl/alabijak/emd/projekt/sledzie.csv"
+
+if (!file.exists(file_name)) {
+  download.file(source_url, destfile = file_name, method = "wget")
+}
+```
+
+Po ewentualnym pobraniu wczytujemy dane do pamięci.
+```{r wczytanie-danych, message = FALSE, warning = FALSE}
+library('knitr')
+library('dplyr')
+library('tidyverse')
+
+content = read_csv(file_name, col_names = TRUE)
+
+kable(head(content[0:11], n = 6), align = 'c', caption = 'Wybrane pomiary')
+```
+
+Jak możemy zaobserwować, część danych nie została uzupełniona. Zamiast wartości `NA` mamy do czynienia z wartościami `?`.
+
+# Przetwarzanie brakujących danych
+```{r przetwarzanie-danych}
+content[content == "?"] <- NA
+```
+Po zamianie znaku `?` na wartość `NA` musimy przeprowadzić zmianę typu danych kolumn.
+
+```{r ponowne-typowanie}
+cols = colnames(content)
+content[cols] <- sapply(content[cols], as.numeric)
+```
+Po tych prostych operacjach wszystkie nasze kolumny mają odopowiedni typ danych, a wartości brakujące zostały zastąpione przez `NA`.

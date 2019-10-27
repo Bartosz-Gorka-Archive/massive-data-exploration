@@ -1641,12 +1641,155 @@ summary {
 
 <div id="TOC">
 <ul>
-<li><a href="#podsumowanie">Podsumowanie</a></li>
+<li><a href="#podsumowanie-analizy">Podsumowanie analizy</a></li>
+<li><a href="#wykorzystane-biblioteki">Wykorzystane biblioteki</a></li>
+<li><a href="#ustawienie-ziarna-generatora">Ustawienie ziarna generatora</a></li>
+<li><a href="#wczytanie-danych-z-pliku">Wczytanie danych z pliku</a></li>
+<li><a href="#przetwarzanie-brakujących-danych">Przetwarzanie brakujących danych</a></li>
 </ul>
 </div>
 
-<div id="podsumowanie" class="section level1">
-<h1>Podsumowanie</h1>
+<div id="podsumowanie-analizy" class="section level1">
+<h1>Podsumowanie analizy</h1>
+<p>TODO</p>
+</div>
+<div id="wykorzystane-biblioteki" class="section level1">
+<h1>Wykorzystane biblioteki</h1>
+<ul>
+<li><code>knitr</code></li>
+<li><code>dplyr</code></li>
+<li><code>tidyverse</code></li>
+</ul>
+</div>
+<div id="ustawienie-ziarna-generatora" class="section level1">
+<h1>Ustawienie ziarna generatora</h1>
+<p>Celem zapewnienia powtarzalności operacji losowania, a co za tym idzie powtarzalności wyników przy każdym uruchomieniu raportu na tych samych danych zastosowano ziarno generatora o wartości <code>102019</code>.</p>
+<pre class="r"><code>set.seed(102019)</code></pre>
+</div>
+<div id="wczytanie-danych-z-pliku" class="section level1">
+<h1>Wczytanie danych z pliku</h1>
+<p>Dane zamieszczone na stronie przedmiotu w postaci pliku CSV pobieramy wyłącznie w sytuacji braku pliku w katalogu roboczym. Pozwala to nam na ograniczenie niepotrzebnego transferu danych, jeżeli plik już istnieje.</p>
+<pre class="r"><code>file_name = &quot;sledzie.csv&quot;
+source_url = &quot;http://www.cs.put.poznan.pl/alabijak/emd/projekt/sledzie.csv&quot;
+
+if (!file.exists(file_name)) {
+  download.file(source_url, destfile = file_name, method = &quot;wget&quot;)
+}</code></pre>
+<p>Po ewentualnym pobraniu wczytujemy dane do pamięci.</p>
+<pre class="r"><code>library('knitr')
+library('dplyr')
+library('tidyverse')
+
+content = read_csv(file_name, col_names = TRUE)
+
+kable(head(content[0:11], n = 6), align = 'c', caption = 'Wybrane pomiary')</code></pre>
+<table>
+<caption>Wybrane pomiary</caption>
+<thead>
+<tr class="header">
+<th align="center">X1</th>
+<th align="center">length</th>
+<th align="center">cfin1</th>
+<th align="center">cfin2</th>
+<th align="center">chel1</th>
+<th align="center">chel2</th>
+<th align="center">lcop1</th>
+<th align="center">lcop2</th>
+<th align="center">fbar</th>
+<th align="center">recr</th>
+<th align="center">cumf</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">23.0</td>
+<td align="center">0.02778</td>
+<td align="center">0.27785</td>
+<td align="center">2.46875</td>
+<td align="center">?</td>
+<td align="center">2.54787</td>
+<td align="center">26.35881</td>
+<td align="center">0.356</td>
+<td align="center">482831</td>
+<td align="center">0.3059879</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="center">22.5</td>
+<td align="center">0.02778</td>
+<td align="center">0.27785</td>
+<td align="center">2.46875</td>
+<td align="center">21.43548</td>
+<td align="center">2.54787</td>
+<td align="center">26.35881</td>
+<td align="center">0.356</td>
+<td align="center">482831</td>
+<td align="center">0.3059879</td>
+</tr>
+<tr class="odd">
+<td align="center">2</td>
+<td align="center">25.0</td>
+<td align="center">0.02778</td>
+<td align="center">0.27785</td>
+<td align="center">2.46875</td>
+<td align="center">21.43548</td>
+<td align="center">2.54787</td>
+<td align="center">26.35881</td>
+<td align="center">0.356</td>
+<td align="center">482831</td>
+<td align="center">0.3059879</td>
+</tr>
+<tr class="even">
+<td align="center">3</td>
+<td align="center">25.5</td>
+<td align="center">0.02778</td>
+<td align="center">0.27785</td>
+<td align="center">2.46875</td>
+<td align="center">21.43548</td>
+<td align="center">2.54787</td>
+<td align="center">26.35881</td>
+<td align="center">0.356</td>
+<td align="center">482831</td>
+<td align="center">0.3059879</td>
+</tr>
+<tr class="odd">
+<td align="center">4</td>
+<td align="center">24.0</td>
+<td align="center">0.02778</td>
+<td align="center">0.27785</td>
+<td align="center">2.46875</td>
+<td align="center">21.43548</td>
+<td align="center">2.54787</td>
+<td align="center">26.35881</td>
+<td align="center">0.356</td>
+<td align="center">482831</td>
+<td align="center">0.3059879</td>
+</tr>
+<tr class="even">
+<td align="center">5</td>
+<td align="center">22.0</td>
+<td align="center">0.02778</td>
+<td align="center">0.27785</td>
+<td align="center">2.46875</td>
+<td align="center">21.43548</td>
+<td align="center">2.54787</td>
+<td align="center">?</td>
+<td align="center">0.356</td>
+<td align="center">482831</td>
+<td align="center">0.3059879</td>
+</tr>
+</tbody>
+</table>
+<p>Jak możemy zaobserwować, część danych nie została uzupełniona. Zamiast wartości <code>NA</code> mamy do czynienia z wartościami <code>?</code>.</p>
+</div>
+<div id="przetwarzanie-brakujących-danych" class="section level1">
+<h1>Przetwarzanie brakujących danych</h1>
+<pre class="r"><code>content[content == &quot;?&quot;] &lt;- NA</code></pre>
+<p>Po zamianie znaku <code>?</code> na wartość <code>NA</code> musimy przeprowadzić zmianę typu danych kolumn.</p>
+<pre class="r"><code>cols = colnames(content)
+content[cols] &lt;- sapply(content[cols], as.numeric)</code></pre>
+<p>Po tych prostych operacjach wszystkie nasze kolumny mają odopowiedni typ danych, a wartości brakujące zostały zastąpione przez <code>NA</code>.</p>
 </div>
 
 
