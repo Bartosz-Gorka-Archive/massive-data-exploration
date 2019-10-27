@@ -5,24 +5,26 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
   pdf_document: 
     toc: true
+  md_document:
+    variant: markdown_github
   html_document:
     toc: true
     df_print: paged
-  md_document:
-    variant: markdown_github
 ---
 ```{r setup, include=FALSE}
-
+pdf.options(encoding = 'CP1250')
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Podsumowanie analizy
-TODO
+TODO: Podsumowanie na koniec
 
 # Wykorzystane biblioteki
 * `knitr`
 * `dplyr`
 * `tidyverse`
+* `ggplot2`
+* `gridExtra`
 
 # Ustawienie ziarna generatora
 Celem zapewnienia powtarzalności operacji losowania, a co za tym idzie powtarzalności wyników przy każdym uruchomieniu raportu na tych samych danych zastosowano ziarno generatora o wartości `102019`.
@@ -30,6 +32,25 @@ Celem zapewnienia powtarzalności operacji losowania, a co za tym idzie powtarza
 ```{r ziarno-losowosci}
 set.seed(102019)
 ```
+
+# Charakterystyka obserwacji - zastosowane atrybuty
+W ramach analizy mamy do czynienia z obserwacjami opisanymi za pomocą następujących atrybutów:
+
+* **length**: długość złowionego śledzia [cm]
+* **cfin1**: dostępność planktonu [zagęszczenie *Calanus finmarchicus* gat. 1]
+* **cfin2**: dostępność planktonu [zagęszczenie *Calanus finmarchicus* gat. 2];
+* **chel1**: dostępność planktonu [zagęszczenie *Calanus helgolandicus* gat. 1];
+* **chel2**: dostępność planktonu [zagęszczenie *Calanus helgolandicus* gat. 2];
+* **lcop1**: dostępność planktonu [zagęszczenie *widłonogów* gat. 1];
+* **lcop2**: dostępność planktonu [zagęszczenie *widłonogów* gat. 2];
+* **fbar**: natężenie połowów w regionie [ułamek pozostawionego narybku];
+* **recr**: roczny narybek [liczba śledzi];
+* **cumf**: łączne roczne natężenie połowów w regionie [ułamek pozostawionego narybku];
+* **totaln**: łączna liczba ryb złowionych w ramach połowu [liczba śledzi];
+* **sst**: temperatura przy powierzchni wody [°C];
+* **sal**: poziom zasolenia wody [Knudsen ppt];
+* **xmonth**: miesiąc połowu [numer miesiąca];
+* **nao**: oscylacja północnoatlantycka [mb].
 
 # Wczytanie danych z pliku
 Dane zamieszczone na stronie przedmiotu w postaci pliku CSV pobieramy wyłącznie w sytuacji braku pliku w katalogu roboczym. Pozwala to nam na ograniczenie niepotrzebnego transferu danych, jeżeli plik już istnieje.
@@ -54,14 +75,135 @@ content =
   select(-1)
 
 content[0:11] %>%
-  head(n = 6) %>%
+  head(n = 5) %>%
   kable(align = 'c', caption = 'Wybrane pomiary')
 ```
 
-Oryginalnie zbiór posiada znaki `?` jako oznaczenie wartości pustej (brakującej). Dzięki wykorzystaniu parametru `na` podczas wywołania funkcji `read_csv` możemy zastąpić znak `?` poprawnym oznaczeniem braku wartości `NA`.
-
-# Przetwarzanie brakujących danych
-TODO - jakieś wnioskowanie tutaj? Uśrednienie wartości?
+Oryginalnie zbiór posiada znaki `?` jako oznaczenie wartości pustej (brakującej). Dzięki wykorzystaniu parametru `na` podczas wywołania funkcji `read_csv` możemy zastąpić znak `?` poprawnym oznaczeniem braku wartości `NA`. W tabeli `Wybrane pomiary` zaprezentowano pierwsze pięć obserwacji.
 
 # Podstawowe statystyki zbioru danych
-W zbiorze danych mamy do czynienia z `r count(content)` obserwacjami opisanych za pomocą `r length(content)` atrybutów.  
+```{r, ECHO = FALSE}
+total_records = count(content)
+total_records_without_na_values = count(na.omit(content))
+```
+W zbiorze danych mamy do czynienia z `r total_records` obserwacjami opisanych za pomocą `r length(content)` atrybutów. W całym zbiorze mamy do czynienia z `r total_records_without_na_values` obserwacjami bez wartości pustych co stanowi `r format((total_records_without_na_values/total_records) * 100, digits = 2)` procent całego zbioru.
+
+## Statystyka parametrów obserwacji
+```{r, statystyka-zbioru-danych}
+content %>%
+  summary() %>%
+  kable(align = 'c', caption = 'Statystyka zbioru danych')
+```
+TODO: Poprawić tabelkę, nie mieści się na stronie PDF
+
+## Rozkład wartości cech
+```{r, cechy1, ECHO = FALSE, message = FALSE, warning = FALSE}
+library('ggplot2')
+library('gridExtra')
+
+ggplot(content, aes(x = length)) + geom_histogram(binwidth = 0.25) + 
+  theme_bw() + ggtitle('Długość złowionego śledzia [cm]') + 
+  xlab(sprintf('Długość [cm]')) + ylab('Liczba obserwacji')
+```
+Jak możemy zaobserwować, większość śledzi w połowie ma długość od 23 do 27 centymetrów.
+
+```{r, cechy2, ECHO = FALSE, message = FALSE, warning = FALSE}
+plot_cfin1 <- ggplot(content, aes(x = cfin1)) + geom_histogram(binwidth = 1.0) +
+  theme_bw() + ggtitle('Calanus finmarchicus gat. 1') + 
+  xlab(sprintf('Zagęszczenie planktonu [j]')) + ylab('Liczba obserwacji')
+
+plot_cfin2 <- ggplot(content, aes(x = cfin2)) + geom_histogram(binwidth = 1.0) +
+  theme_bw() + ggtitle('Calanus finmarchicus gat. 2') + 
+  xlab(sprintf('Zagęszczenie planktonu [j]')) + ylab('Liczba obserwacji')
+
+grid.arrange(plot_cfin1, plot_cfin2, nrow = 1)
+```
+
+```{r, cechy3, ECHO = FALSE, message = FALSE, warning = FALSE}
+plot_chel1 <- ggplot(content, aes(x = chel1)) + geom_histogram(binwidth = 0.5) +
+  theme_bw() + ggtitle('Calanus helgolandicus gat. 1') + 
+  xlab(sprintf('Zagęszczenie planktonu [j]')) + ylab('Liczba obserwacji')
+
+plot_chel2 <- ggplot(content, aes(x = chel2)) + geom_histogram(binwidth = 0.5) +
+  theme_bw() + ggtitle('Calanus helgolandicus gat. 2') + 
+  xlab(sprintf('Zagęszczenie planktonu [j]')) + ylab('Liczba obserwacji')
+
+grid.arrange(plot_chel1, plot_chel2, nrow = 1)
+```
+```{r, cechy4, ECHO = FALSE, message = FALSE, warning = FALSE}
+plot_lcop1 <- ggplot(content, aes(x = lcop1)) + geom_histogram(binwidth = 0.5) +
+  theme_bw() + ggtitle('Widłonogi gat. 1') + 
+  xlab(sprintf('Zagęszczenie planktonu [j]')) + ylab('Liczba obserwacji')
+
+plot_lcop2 <- ggplot(content, aes(x = lcop2)) + geom_histogram(binwidth = 0.5) +
+  theme_bw() + ggtitle('Widłonogi gat. 2') + 
+  xlab(sprintf('Zagęszczenie planktonu [j]')) + ylab('Liczba obserwacji')
+
+grid.arrange(plot_lcop1, plot_lcop2, nrow = 1)
+```
+
+```{r, cechy5, ECHO = FALSE, message = FALSE, warning = FALSE}
+plot_fbar <- ggplot(content, aes(x = fbar)) + geom_histogram(binwidth = 0.05) +
+  theme_bw() + ggtitle('Natężenie połowów') + 
+  xlab(sprintf('Ułamek pozostawionego narybku')) + ylab('Liczba obserwacji')
+
+plot_recr <- ggplot(content, aes(x = recr)) + geom_histogram(binwidth = 50000.0) +
+  theme_bw() + ggtitle('Roczny narybek') + 
+  xlab(sprintf('Liczba śledzi')) + ylab('Liczba obserwacji')
+
+plot_cumf <- ggplot(content, aes(x = cumf)) + geom_histogram(binwidth = 0.02) +
+  theme_bw() + ggtitle('Łączne roczne natężenie połowów') + 
+  xlab(sprintf('Ułamek pozostawionego narybku')) + ylab('Liczba obserwacji')
+
+plot_totaln <- ggplot(content, aes(x = totaln)) + geom_histogram(binwidth = 1000.0) +
+  theme_bw() + ggtitle('Łączna liczba złowionych ryb') + 
+  xlab(sprintf('Liczba śledzi')) + ylab('Liczba obserwacji')
+
+grid.arrange(plot_fbar, plot_recr, plot_cumf, plot_totaln, nrow = 2)
+```
+
+```{r, cechy6, ECHO = FALSE, message = FALSE, warning = FALSE}
+plot_sst <- ggplot(content, aes(x = sst)) + geom_histogram(binwidth = 0.1) +
+  theme_bw() + ggtitle('Temperatura przy powierzchni wody') + 
+  xlab(sprintf('Temperatura')) + ylab('Liczba obserwacji')
+
+plot_sal <- ggplot(content, aes(x = sal)) + geom_histogram(binwidth = 0.01) +
+  theme_bw() + ggtitle('Poziom zasolenia wody') + 
+  xlab(sprintf('Zasolenie wody')) + ylab('Liczba obserwacji')
+
+plot_xmonth <- ggplot(content, aes(x = xmonth)) + geom_histogram(binwidth = 0.5) +
+  theme_bw() + ggtitle('Miesic połowu') + 
+  xlab(sprintf('Miesiąc')) + ylab('Liczba obserwacji')
+
+plot_nao <- ggplot(content, aes(x = nao)) + geom_histogram(binwidth = 0.5) +
+  theme_bw() + ggtitle('Oscylacja północnoatlantycka') + 
+  xlab(sprintf('Oscylacja')) + ylab('Liczba obserwacji')
+
+grid.arrange(plot_sst, plot_sal, plot_xmonth, plot_nao, nrow = 2)
+```
+
+Analizując przedstawione wykresy dotyczące poszczególnych atrybutów opisujących połowy możemy zaobserwować rozkład zbliżony do normalnego dla wielu z nich (chociażby parametr długości śledzia). W przypadku parametrów dostępności planktonu *Calanus finmarchicus gat. 1* oraz *Widłonogów gat. 1* obserwujemy występowanie drobnej próbki danych odbierających znacząco od reszty. Na potrzeby dalszego przetwarzania dane zostaną oczyszczone z tych obserwacji odstających.
+
+```{r obserwacje-odstajace}
+without_outliers =
+  content %>%
+  filter(cfin1 <= 10 | is.na(cfin1)) %>%
+  filter(lcop1 <= 90 | is.na(lcop1))
+```
+Po operacji w zbiorze obserwacji pozostało `r count(without_outliers)` próbek (usunięto `r count(content) - count(without_outliers)` obserwacji).
+
+```{r, cechy7, ECHO = FALSE, message = FALSE, warning = FALSE}
+plot_cfin1_clear <- ggplot(without_outliers, aes(x = cfin1)) + geom_histogram(binwidth = 1.0) +
+  theme_bw() + ggtitle('Calanus finmarchicus gat. 1') + 
+  xlab(sprintf('Zagęszczenie planktonu [j]')) + ylab('Liczba obserwacji')
+
+plot_lcop1_clear <- ggplot(without_outliers, aes(x = lcop1)) + geom_histogram(binwidth = 0.5) +
+  theme_bw() + ggtitle('Widłonogi gat. 1') + 
+  xlab(sprintf('Zagęszczenie planktonu [j]')) + ylab('Liczba obserwacji')
+
+grid.arrange(plot_cfin1_clear, plot_lcop1_clear, nrow = 1)
+```
+
+# Przetwarzanie brakujących danych
+TODO: Analiza jakie atrybuty oraz liczność
+TODO: Uśrednienie wartości bazując na rozkładzie
