@@ -191,64 +191,60 @@ Po ewentualnym pobraniu wczytujemy dane do pamięci.
 \KeywordTok{library}\NormalTok{(}\StringTok{'dplyr'}\NormalTok{)}
 \KeywordTok{library}\NormalTok{(}\StringTok{'tidyverse'}\NormalTok{)}
 
-\NormalTok{content =}\StringTok{ }\KeywordTok{read_csv}\NormalTok{(file_name, }\DataTypeTok{col_names =} \OtherTok{TRUE}\NormalTok{)}
+\NormalTok{content =}
+\StringTok{  }\NormalTok{file_name }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{read_csv}\NormalTok{(}\DataTypeTok{col_names =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{na =} \KeywordTok{c}\NormalTok{(}\StringTok{""}\NormalTok{, }\StringTok{"NA"}\NormalTok{, }\StringTok{"?"}\NormalTok{)) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{select}\NormalTok{(}\OperatorTok{-}\DecValTok{1}\NormalTok{)}
 
-\KeywordTok{kable}\NormalTok{(}\KeywordTok{head}\NormalTok{(content[}\DecValTok{0}\OperatorTok{:}\DecValTok{11}\NormalTok{], }\DataTypeTok{n =} \DecValTok{6}\NormalTok{), }\DataTypeTok{align =} \StringTok{'c'}\NormalTok{, }\DataTypeTok{caption =} \StringTok{'Wybrane pomiary'}\NormalTok{)}
+\NormalTok{content[}\DecValTok{0}\OperatorTok{:}\DecValTok{11}\NormalTok{] }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{head}\NormalTok{(}\DataTypeTok{n =} \DecValTok{6}\NormalTok{) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{kable}\NormalTok{(}\DataTypeTok{align =} \StringTok{'c'}\NormalTok{, }\DataTypeTok{caption =} \StringTok{'Wybrane pomiary'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{longtable}[]{@{}ccccccccccc@{}}
 \caption{Wybrane pomiary}\tabularnewline
 \toprule
-X1 & length & cfin1 & cfin2 & chel1 & chel2 & lcop1 & lcop2 & fbar &
-recr & cumf\tabularnewline
+length & cfin1 & cfin2 & chel1 & chel2 & lcop1 & lcop2 & fbar & recr &
+cumf & totaln\tabularnewline
 \midrule
 \endfirsthead
 \toprule
-X1 & length & cfin1 & cfin2 & chel1 & chel2 & lcop1 & lcop2 & fbar &
-recr & cumf\tabularnewline
+length & cfin1 & cfin2 & chel1 & chel2 & lcop1 & lcop2 & fbar & recr &
+cumf & totaln\tabularnewline
 \midrule
 \endhead
-0 & 23.0 & 0.02778 & 0.27785 & 2.46875 & ? & 2.54787 & 26.35881 & 0.356
-& 482831 & 0.3059879\tabularnewline
-1 & 22.5 & 0.02778 & 0.27785 & 2.46875 & 21.43548 & 2.54787 & 26.35881 &
-0.356 & 482831 & 0.3059879\tabularnewline
-2 & 25.0 & 0.02778 & 0.27785 & 2.46875 & 21.43548 & 2.54787 & 26.35881 &
-0.356 & 482831 & 0.3059879\tabularnewline
-3 & 25.5 & 0.02778 & 0.27785 & 2.46875 & 21.43548 & 2.54787 & 26.35881 &
-0.356 & 482831 & 0.3059879\tabularnewline
-4 & 24.0 & 0.02778 & 0.27785 & 2.46875 & 21.43548 & 2.54787 & 26.35881 &
-0.356 & 482831 & 0.3059879\tabularnewline
-5 & 22.0 & 0.02778 & 0.27785 & 2.46875 & 21.43548 & 2.54787 & ? & 0.356
-& 482831 & 0.3059879\tabularnewline
+23.0 & 0.02778 & 0.27785 & 2.46875 & NA & 2.54787 & 26.35881 & 0.356 &
+482831 & 0.3059879 & 267380.8\tabularnewline
+22.5 & 0.02778 & 0.27785 & 2.46875 & 21.43548 & 2.54787 & 26.35881 &
+0.356 & 482831 & 0.3059879 & 267380.8\tabularnewline
+25.0 & 0.02778 & 0.27785 & 2.46875 & 21.43548 & 2.54787 & 26.35881 &
+0.356 & 482831 & 0.3059879 & 267380.8\tabularnewline
+25.5 & 0.02778 & 0.27785 & 2.46875 & 21.43548 & 2.54787 & 26.35881 &
+0.356 & 482831 & 0.3059879 & 267380.8\tabularnewline
+24.0 & 0.02778 & 0.27785 & 2.46875 & 21.43548 & 2.54787 & 26.35881 &
+0.356 & 482831 & 0.3059879 & 267380.8\tabularnewline
+22.0 & 0.02778 & 0.27785 & 2.46875 & 21.43548 & 2.54787 & NA & 0.356 &
+482831 & 0.3059879 & 267380.8\tabularnewline
 \bottomrule
 \end{longtable}
 
-Jak możemy zaobserwować, część danych nie została uzupełniona. Zamiast
-wartości \texttt{NA} mamy do czynienia z wartościami \texttt{?}.
+Oryginalnie zbiór posiada znaki \texttt{?} jako oznaczenie wartości
+pustej (brakującej). Dzięki wykorzystaniu parametru \texttt{na} podczas
+wywołania funkcji \texttt{read\_csv} możemy zastąpić znak \texttt{?}
+poprawnym oznaczeniem braku wartości \texttt{NA}.
 
 \hypertarget{przetwarzanie-brakujux105cych-danych}{%
 \section{Przetwarzanie brakujących
 danych}\label{przetwarzanie-brakujux105cych-danych}}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{content[content }\OperatorTok{==}\StringTok{ "?"}\NormalTok{] <-}\StringTok{ }\OtherTok{NA}
-\end{Highlighting}
-\end{Shaded}
+TODO - jakieś wnioskowanie tutaj? Uśrednienie wartości?
 
-Po zamianie znaku \texttt{?} na wartość \texttt{NA} musimy przeprowadzić
-zmianę typu danych kolumn.
+\hypertarget{podstawowe-statystyki-zbioru-danych}{%
+\section{Podstawowe statystyki zbioru
+danych}\label{podstawowe-statystyki-zbioru-danych}}
 
-\begin{Shaded}
-\begin{Highlighting}[]
-\NormalTok{cols =}\StringTok{ }\KeywordTok{colnames}\NormalTok{(content)}
-\NormalTok{content[cols] <-}\StringTok{ }\KeywordTok{sapply}\NormalTok{(content[cols], as.numeric)}
-\end{Highlighting}
-\end{Shaded}
-
-Po tych prostych operacjach wszystkie nasze kolumny mają odopowiedni typ
-danych, a wartości brakujące zostały zastąpione przez \texttt{NA}.
+W zbiorze danych mamy do czynienia z 52582 obserwacjami.
 
 
 \end{document}

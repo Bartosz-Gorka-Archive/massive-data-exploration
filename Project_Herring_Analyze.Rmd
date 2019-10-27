@@ -3,13 +3,13 @@ title: "Eksploracja Masywnych Danych - Analiza danych"
 author: "Kajetan Zimniak & Bartosz Górka"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-  md_document:
-    variant: markdown_github
+  pdf_document: 
+    toc: true
   html_document:
     toc: true
     df_print: paged
-  pdf_document: 
-    toc: true
+  md_document:
+    variant: markdown_github
 ---
 ```{r setup, include=FALSE}
 
@@ -48,21 +48,20 @@ library('knitr')
 library('dplyr')
 library('tidyverse')
 
-content = read_csv(file_name, col_names = TRUE)
+content =
+  file_name %>%
+  read_csv(col_names = TRUE, na = c("", "NA", "?")) %>%
+  select(-1)
 
-kable(head(content[0:11], n = 6), align = 'c', caption = 'Wybrane pomiary')
+content[0:11] %>%
+  head(n = 6) %>%
+  kable(align = 'c', caption = 'Wybrane pomiary')
 ```
 
-Jak możemy zaobserwować, część danych nie została uzupełniona. Zamiast wartości `NA` mamy do czynienia z wartościami `?`.
+Oryginalnie zbiór posiada znaki `?` jako oznaczenie wartości pustej (brakującej). Dzięki wykorzystaniu parametru `na` podczas wywołania funkcji `read_csv` możemy zastąpić znak `?` poprawnym oznaczeniem braku wartości `NA`.
 
 # Przetwarzanie brakujących danych
-```{r przetwarzanie-danych}
-content[content == "?"] <- NA
-```
-Po zamianie znaku `?` na wartość `NA` musimy przeprowadzić zmianę typu danych kolumn.
+TODO - jakieś wnioskowanie tutaj? Uśrednienie wartości?
 
-```{r ponowne-typowanie}
-cols = colnames(content)
-content[cols] <- sapply(content[cols], as.numeric)
-```
-Po tych prostych operacjach wszystkie nasze kolumny mają odopowiedni typ danych, a wartości brakujące zostały zastąpione przez `NA`.
+# Podstawowe statystyki zbioru danych
+W zbiorze danych mamy do czynienia z `r count(content)` obserwacjami opisanych za pomocą `r length(content)` atrybutów.  
