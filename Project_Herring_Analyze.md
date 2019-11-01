@@ -11,6 +11,9 @@ Wykorzystane biblioteki
 -   `tidyverse`
 -   `ggplot2`
 -   `gridExtra`
+-   `imputeTS`
+-   `corrplot`
+-   `reshape2`
 
 Ustawienie ziarna generatora
 ============================
@@ -122,16 +125,17 @@ content %>%
   kable(align = 'c', caption = 'Statystyka zbioru danych')
 ```
 
-|       |      length     |        cfin1        |      cfin2      |      chel1     |      chel2     |       lcop1      |      lcop2     |      fbar      |       recr      |       cumf      |      totaln     |      sst      |      sal      |     xmonth     |        nao       |
-|-------|:---------------:|:-------------------:|:---------------:|:--------------:|:--------------:|:----------------:|:--------------:|:--------------:|:---------------:|:---------------:|:---------------:|:-------------:|:-------------:|:--------------:|:----------------:|
-|       |    Min. :19.0   |    Min. : 0.0000    |  Min. : 0.0000  |  Min. : 0.000  |  Min. : 5.238  |   Min. : 0.3074  |  Min. : 7.849  |  Min. :0.0680  |  Min. : 140515  |  Min. :0.06833  |  Min. : 144137  |  Min. :12.77  |  Min. :35.40  |  Min. : 1.000  |  Min. :-4.89000  |
-|       |   1st Qu.:24.0  |   1st Qu.: 0.0000   | 1st Qu.: 0.2778 | 1st Qu.: 2.469 | 1st Qu.:13.427 |  1st Qu.: 2.5479 | 1st Qu.:17.808 | 1st Qu.:0.2270 | 1st Qu.: 360061 | 1st Qu.:0.14809 | 1st Qu.: 306068 | 1st Qu.:13.60 | 1st Qu.:35.51 | 1st Qu.: 5.000 | 1st Qu.:-1.89000 |
-|       |   Median :25.5  |   Median : 0.1111   | Median : 0.7012 | Median : 5.750 | Median :21.673 |  Median : 7.0000 | Median :24.859 | Median :0.3320 | Median : 421391 | Median :0.23191 | Median : 539558 | Median :13.86 | Median :35.51 | Median : 8.000 | Median : 0.20000 |
-|       |    Mean :25.3   |    Mean : 0.4458    |  Mean : 2.0248  |  Mean :10.006  |  Mean :21.221  |  Mean : 12.8108  |  Mean :28.419  |  Mean :0.3304  |  Mean : 520366  |  Mean :0.22981  |  Mean : 514973  |  Mean :13.87  |  Mean :35.51  |  Mean : 7.258  |  Mean :-0.09236  |
-|       |   3rd Qu.:26.5  |   3rd Qu.: 0.3333   | 3rd Qu.: 1.7936 | 3rd Qu.:11.500 | 3rd Qu.:27.193 | 3rd Qu.: 21.2315 | 3rd Qu.:37.232 | 3rd Qu.:0.4560 | 3rd Qu.: 724151 | 3rd Qu.:0.29803 | 3rd Qu.: 730351 | 3rd Qu.:14.16 | 3rd Qu.:35.52 | 3rd Qu.: 9.000 | 3rd Qu.: 1.63000 |
-|       |    Max. :32.5   |    Max. :37.6667    |  Max. :19.3958  |  Max. :75.000  |  Max. :57.706  |  Max. :115.5833  |  Max. :68.736  |  Max. :0.8490  |  Max. :1565890  |  Max. :0.39801  |  Max. :1015595  |  Max. :14.73  |  Max. :35.61  |  Max. :12.000  |  Max. : 5.08000  |
-|       |        NA       |      NA’s :1581     |    NA’s :1536   |   NA’s :1555   |   NA’s :1556   |    NA’s :1653    |   NA’s :1591   |       NA       |        NA       |        NA       |        NA       |   NA’s :1584  |       NA      |       NA       |        NA        |
-| TODO: | Poprawić tabelk | ę, nie mieści się n |  a stronie PDF  |                |                |                  |                |                |                 |                 |                 |               |               |                |                  |
+|     |    length    |      cfin1      |      cfin2      |      chel1     |      chel2     |       lcop1      |      lcop2     |      fbar      |       recr      |       cumf      |      totaln     |      sst      |      sal      |     xmonth     |        nao       |
+|-----|:------------:|:---------------:|:---------------:|:--------------:|:--------------:|:----------------:|:--------------:|:--------------:|:---------------:|:---------------:|:---------------:|:-------------:|:-------------:|:--------------:|:----------------:|
+|     |  Min. :19.0  |  Min. : 0.0000  |  Min. : 0.0000  |  Min. : 0.000  |  Min. : 5.238  |   Min. : 0.3074  |  Min. : 7.849  |  Min. :0.0680  |  Min. : 140515  |  Min. :0.06833  |  Min. : 144137  |  Min. :12.77  |  Min. :35.40  |  Min. : 1.000  |  Min. :-4.89000  |
+|     | 1st Qu.:24.0 | 1st Qu.: 0.0000 | 1st Qu.: 0.2778 | 1st Qu.: 2.469 | 1st Qu.:13.427 |  1st Qu.: 2.5479 | 1st Qu.:17.808 | 1st Qu.:0.2270 | 1st Qu.: 360061 | 1st Qu.:0.14809 | 1st Qu.: 306068 | 1st Qu.:13.60 | 1st Qu.:35.51 | 1st Qu.: 5.000 | 1st Qu.:-1.89000 |
+|     | Median :25.5 | Median : 0.1111 | Median : 0.7012 | Median : 5.750 | Median :21.673 |  Median : 7.0000 | Median :24.859 | Median :0.3320 | Median : 421391 | Median :0.23191 | Median : 539558 | Median :13.86 | Median :35.51 | Median : 8.000 | Median : 0.20000 |
+|     |  Mean :25.3  |  Mean : 0.4458  |  Mean : 2.0248  |  Mean :10.006  |  Mean :21.221  |  Mean : 12.8108  |  Mean :28.419  |  Mean :0.3304  |  Mean : 520366  |  Mean :0.22981  |  Mean : 514973  |  Mean :13.87  |  Mean :35.51  |  Mean : 7.258  |  Mean :-0.09236  |
+|     | 3rd Qu.:26.5 | 3rd Qu.: 0.3333 | 3rd Qu.: 1.7936 | 3rd Qu.:11.500 | 3rd Qu.:27.193 | 3rd Qu.: 21.2315 | 3rd Qu.:37.232 | 3rd Qu.:0.4560 | 3rd Qu.: 724151 | 3rd Qu.:0.29803 | 3rd Qu.: 730351 | 3rd Qu.:14.16 | 3rd Qu.:35.52 | 3rd Qu.: 9.000 | 3rd Qu.: 1.63000 |
+|     |  Max. :32.5  |  Max. :37.6667  |  Max. :19.3958  |  Max. :75.000  |  Max. :57.706  |  Max. :115.5833  |  Max. :68.736  |  Max. :0.8490  |  Max. :1565890  |  Max. :0.39801  |  Max. :1015595  |  Max. :14.73  |  Max. :35.61  |  Max. :12.000  |  Max. : 5.08000  |
+|     |      NA      |    NA’s :1581   |    NA’s :1536   |   NA’s :1555   |   NA’s :1556   |    NA’s :1653    |   NA’s :1591   |       NA       |        NA       |        NA       |        NA       |   NA’s :1584  |       NA      |       NA       |        NA        |
+
+TODO: Poprawić tabelkę, nie mieści się na stronie PDF
 
 Rozkład wartości cech
 ---------------------
@@ -243,6 +247,9 @@ parametrów dostępności planktonu *Calanus finmarchicus gat. 1* oraz
 odbierających znacząco od reszty. Na potrzeby dalszego przetwarzania
 dane zostaną oczyszczone z tych obserwacji odstających.
 
+TODO: Można opisać pozostałe wykresy bazując na danych w tabeli
+poprzedniej (min, max …)
+
 ``` r
 without_outliers =
   content %>%
@@ -270,5 +277,208 @@ grid.arrange(plot_cfin1_clear, plot_lcop1_clear, nrow = 1)
 Przetwarzanie brakujących danych
 ================================
 
-TODO: Analiza jakie atrybuty oraz liczność TODO: Uśrednienie wartości
-bazując na rozkładzie
+Korzystajac z pakietu `imputeTS` i funkcji `statsNA` możemy
+przeprowadzić analizę wartości pustych w poszczególnych obserwacjach.
+
+``` r
+library('imputeTS')
+
+without_outliers %>%
+  colnames() %>%
+  sapply(function(attr) {
+    statsNA(without_outliers[[attr]], printOnly = FALSE)
+  }) %>%
+  kable()
+```
+
+|                     | length | cfin1 | cfin2 | chel1 | chel2 | lcop1 | lcop2 | fbar  | recr  | cumf  | totaln | sst   | sal   | xmonth | nao   |
+|---------------------|:-------|:------|:------|:------|:------|:------|:------|:------|:------|:------|:-------|:------|:------|:-------|:------|
+| lengthTimeSeries    | 52576  | 52576 | 52576 | 52576 | 52576 | 52576 | 52576 | 52576 | 52576 | 52576 | 52576  | 52576 | 52576 | 52576  | 52576 |
+| numberNAs           | 0      | 1581  | 1536  | 1555  | 1556  | 1653  | 1591  | 0     | 0     | 0     | 0      | 1584  | 0     | 0      | 0     |
+| percentageNAs       | 0%     | 3.01% | 2.92% | 2.96% | 2.96% | 3.14% | 3.03% | 0%    | 0%    | 0%    | 0%     | 3.01% | 0%    | 0%     | 0%    |
+| naGapLongest        | NA     | 3     | 3     | 3     | 3     | 2     | 3     | NA    | NA    | NA    | NA     | 3     | NA    | NA     | NA    |
+| naGapMostFrequent   | 52576  | 1     | 1     | 1     | 1     | 1     | 1     | 52576 | 52576 | 52576 | 52576  | 1     | 52576 | 52576  | 52576 |
+| naGapMostOverallNAs | 52576  | 1     | 1     | 1     | 1     | 1     | 1     | 52576 | 52576 | 52576 | 52576  | 1     | 52576 | 52576  | 52576 |
+
+TODO: Poprawić tabelkę, źle wygląda w PDF
+
+Analizując zaprezentowane podsumowania dla wszystkich atrybutów, możemy
+zauważyć że wartości puste stanowią mniej niż 3.5% całego zbioru
+obserwacji. Ponadto ich rozkład ma charater losowy oraz są równomierne.
+W danych nie występują długie serie wartości pustych (sekwencje liczące
+dwie oraz trzy wartości puste są rzadkie). Wykorzystując wiedzę o
+charakterystyce danych możemy wykonać interpolację z wykorzystaniem
+filtru Kalmana, aby pozbyć się wartości pustych.
+
+``` r
+without_outliers$cfin1 <- na_kalman(without_outliers$cfin1)
+without_outliers$cfin2 <- na_kalman(without_outliers$cfin2)
+without_outliers$chel1 <- na_kalman(without_outliers$chel1)
+without_outliers$chel2 <- na_kalman(without_outliers$chel2)
+without_outliers$lcop1 <- na_kalman(without_outliers$lcop1)
+without_outliers$lcop2 <- na_kalman(without_outliers$lcop2)
+without_outliers$sst <- na_kalman(without_outliers$sst)
+```
+
+TODO: Użyć jakieś funkcji
+
+Korelacja atrybutów
+===================
+
+``` r
+library('corrplot')
+
+corelation_matrix <- cor(without_outliers)
+corrplot(corelation_matrix, method = "circle", title = "Macierz korelacji")
+```
+
+![](Project_Herring_Analyze_files/figure-markdown_github/korelacja-1.png)
+
+Na wykresie powyższym została przedstawiona macierz korelacji pomiędzy
+poszczególnymi atrybutami. Jak możemy zaobserwować, istnieje bardzo
+silna pozytywna korelacja pomiędzy parametrem `chel1` oraz `lcop1`
+(wynosząca w przybliżeniu `0.96`), a także `chel2` oraz `lcop2`
+(wynosząca `0.88`). Wynika z tego że występowanie planktonu
+`Calanus helgolandicus gat. 1` związane jest z obecnością
+`widłonogów gat. 1` i vice versa. Podobnie w przypadku planktonów
+drugiego gatunku czyli pary `Calanus helgolandicus gat. 2` oraz
+`widłonogi gat. 2`.
+
+Analizując dalej macierz korelacji możemy zaobserwować pozytywną
+zależność pomiędzy `cfin2` i `lcop2` wynosząca `0.65` - zagęszczenie
+`Calanus finmarchicus gat. 2` ma powiązanie w obecności
+`widłonogów gat. 2`.
+
+Ciekawą zależnością jest `sst` oraz `nao`. Korzystając z opisu
+`oscylacji północnoatlantyckiej` na stronie encyklopedii
+[Wikipedia](https://pl.wikipedia.org/wiki/Oscylacja_p%C3%B3%C5%82nocnoatlantycka)
+mamy do czynienia ze zjawiskiem meterologicznym wpływającym na klimat,
+co manifestuje się między innymi zmianą temperatury. Podkreśla to
+wiarygodność naszych obserwacji, gdyż doszło do odwzorowania zjawiska
+fizycznego w naszych danych.
+
+Wysoką wartość zależności `fbar` oznaczającej
+`natężenia połowów w regionie` oraz `cumf` czyli
+`łączne roczne natężenie połowów w regionie` wynoszącej `0.82` można
+łatwo wyjaśnić. Łowienie w danym miejscu przez długi czas sumarycznie
+wpłynie na wysoką wartość drugiego parametru.
+
+Interesującą z punktu widzenia tematu raportu jest zależność temperatury
+przy powierzchni wody i długości złowionego śledzia. Wynosi ona `-0.45`.
+Większa temperatura ma odzwierciedlenie w mniejszych rozmiarach śledzi.
+
+TODO: Dodać wykresy dla porównań TODO: Poprawić ten opis aby dać tekst a
+nie same nazwy kolumn
+
+Zmienność cech w ramach następujących po siebie połowów
+=======================================================
+
+W kolejnych podrozdziałach zostanie przeanalizowana zmienność cech.
+Naszym celem jest wykrycie przyczyny spadku długości śledzi w połowach.
+
+Długość śledzi
+--------------
+
+``` r
+df_with_ids <- mutate(without_outliers, id = as.numeric(rownames(without_outliers)))
+sampled_data <- sample_n(df_with_ids, 500)
+```
+
+``` r
+zmiana_sledzi_plot <- ggplot(
+  sampled_data,
+  aes(x=id, y=length)
+) + theme_bw() + 
+  theme(axis.text.x=element_blank()) + geom_point() + geom_smooth(se = FALSE, colour = "#f5ad00", size = 1.0) + ggtitle('Zmiana długości śledzia') +  xlab('') + ylab('Długość [cm]') + geom_vline(xintercept = 17000, colour="blue", linetype = 2, size = 1.0)
+
+zmiana_sledzi_plot
+```
+
+![](Project_Herring_Analyze_files/figure-markdown_github/dlugosc-sledzi-1.png)
+
+TODO: Opisać wykres
+
+``` r
+library('gganimate')
+library('gifski')
+
+ggplot(
+  sampled_data,
+  group = xmonth,
+  aes(x=id, y=length)
+) + theme_bw() + 
+  geom_line() + transition_reveal(id)
+```
+
+![](Project_Herring_Analyze_files/figure-markdown_github/zmiana-rozmiaru-animacja-1.gif)
+
+TODO: Źródło danych w postaci uśrednionych danych z połowów TODO: Opisać
+wykres TODO: W PDF bez tej animacji
+
+Dostępność pokarmu
+------------------
+
+``` r
+library('reshape2')
+
+plancton_food <- melt(sampled_data[, c(16, 2:7)], id.vars = c('id'), variable.name = "TypPlanktonu", value.name = "Values")
+ggplot(
+  plancton_food,
+  aes(id, Values, color = TypPlanktonu)
+) + theme_bw() + 
+  theme(axis.text.x=element_blank()) + geom_smooth(se = FALSE) + ggtitle('Zmiana dostępności pokarmu') +  xlab('') + ylab('Dostępność pokarmu [zagęszczenie]') + geom_vline(xintercept = 17000, colour="blue", linetype = 2, size = 1.0)
+```
+
+![](Project_Herring_Analyze_files/figure-markdown_github/dostepnosc-pokarmu-1.png)
+
+TODO: Opisać wykres
+
+Parametry środowiska
+--------------------
+
+``` r
+parametry_srodowiska <- sampled_data[, c(12, 13, 15)]
+normalized_environment <- as.data.frame(lapply(parametry_srodowiska, function(x) {
+  (x - min(x)) / (max(x) - min(x))
+}))
+normalized_environment["id"] <- sampled_data[, 16]
+
+environment <- melt(normalized_environment, id.vars = c('id'), variable.name = "Środowisko", value.name = "Values")
+ggplot(
+  environment,
+  aes(id, Values, color = Środowisko)
+) + theme_bw() + 
+  theme(axis.text.x=element_blank()) + geom_smooth(se = FALSE) + ggtitle('Zmiana warunków środowiska') +  xlab('') + ylab('Środowisko (znormalizowana wartość)') + geom_vline(xintercept = 17000, colour="blue", linetype = 2, size = 1.0)
+```
+
+![](Project_Herring_Analyze_files/figure-markdown_github/srodowisko-1.png)
+
+TODO: Opisać wykres
+
+Eksploatacja łowiska
+--------------------
+
+``` r
+parametry_lowiska <- sampled_data[, c(8:11)]
+normalized_lowisko <- as.data.frame(lapply(parametry_lowiska, function(x) {
+  (x - min(x)) / (max(x) - min(x))
+}))
+normalized_lowisko["id"] <- sampled_data[, 16]
+
+lowisko <- melt(normalized_lowisko, id.vars = c('id'), variable.name = "Łowisko", value.name = "Values")
+ggplot(
+  lowisko,
+  aes(id, Values, color = Łowisko)
+) + theme_bw() + 
+  theme(axis.text.x=element_blank()) + geom_smooth(se = FALSE) + ggtitle('Zmiana warunków eksploracji łowiska') +  xlab('') + ylab('Łowisko (znormalizowana wartość)') + geom_vline(xintercept = 17000, colour="blue", linetype = 2, size = 1.0)
+```
+
+![](Project_Herring_Analyze_files/figure-markdown_github/lowisko-1.png)
+
+TODO: Opisać wykres
+
+Regresor - predykcja
+====================
+
+TODO: Dwa regresory TODO: Wskazanie najważniejszych cech TODO:
+Obliczenie błędów

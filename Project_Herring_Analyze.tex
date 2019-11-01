@@ -123,7 +123,7 @@
   \postauthor{\par}
       \predate{\centering\large\emph}
   \postdate{\par}
-    \date{27 October, 2019}
+    \date{01 November, 2019}
 
 
 \begin{document}
@@ -153,6 +153,12 @@ TODO: Podsumowanie na koniec
   \texttt{ggplot2}
 \item
   \texttt{gridExtra}
+\item
+  \texttt{imputeTS}
+\item
+  \texttt{corrplot}
+\item
+  \texttt{reshape2}
 \end{itemize}
 
 \hypertarget{ustawienie-ziarna-generatora}{%
@@ -353,10 +359,10 @@ Max. :0.39801 & Max. :1015595 & Max. :14.73 & Max. :35.61 & Max. :12.000
 & NA & NA's :1581 & NA's :1536 & NA's :1555 & NA's :1556 & NA's :1653 &
 NA's :1591 & NA & NA & NA & NA & NA's :1584 & NA & NA &
 NA\tabularnewline
-TODO: & Poprawić tabelk & ę, nie mieści się n & a stronie PDF & & & & &
-& & & & & & &\tabularnewline
 \bottomrule
 \end{longtable}
+
+TODO: Poprawić tabelkę, nie mieści się na stronie PDF
 
 \hypertarget{rozkux142ad-wartoux15bci-cech}{%
 \subsection{Rozkład wartości cech}\label{rozkux142ad-wartoux15bci-cech}}
@@ -480,6 +486,9 @@ parametrów dostępności planktonu \emph{Calanus finmarchicus gat. 1} oraz
 odbierających znacząco od reszty. Na potrzeby dalszego przetwarzania
 dane zostaną oczyszczone z tych obserwacji odstających.
 
+TODO: Można opisać pozostałe wykresy bazując na danych w tabeli
+poprzedniej (min, max \ldots{})
+
 \begin{Shaded}
 \begin{Highlighting}[]
 \NormalTok{without_outliers =}
@@ -512,8 +521,345 @@ obserwacji).
 \section{Przetwarzanie brakujących
 danych}\label{przetwarzanie-brakujux105cych-danych}}
 
-TODO: Analiza jakie atrybuty oraz liczność TODO: Uśrednienie wartości
-bazując na rozkładzie
+Korzystajac z pakietu \texttt{imputeTS} i funkcji \texttt{statsNA}
+możemy przeprowadzić analizę wartości pustych w poszczególnych
+obserwacjach.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{'imputeTS'}\NormalTok{)}
+
+\NormalTok{without_outliers }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{colnames}\NormalTok{() }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{sapply}\NormalTok{(}\ControlFlowTok{function}\NormalTok{(attr) \{}
+    \KeywordTok{statsNA}\NormalTok{(without_outliers[[attr]], }\DataTypeTok{printOnly =} \OtherTok{FALSE}\NormalTok{)}
+\NormalTok{  \}) }\OperatorTok{%>%}
+\StringTok{  }\KeywordTok{kable}\NormalTok{()}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{longtable}[]{@{}llllllllllllllll@{}}
+\toprule
+& length & cfin1 & cfin2 & chel1 & chel2 & lcop1 & lcop2 & fbar & recr &
+cumf & totaln & sst & sal & xmonth & nao\tabularnewline
+\midrule
+\endhead
+lengthTimeSeries & 52576 & 52576 & 52576 & 52576 & 52576 & 52576 & 52576
+& 52576 & 52576 & 52576 & 52576 & 52576 & 52576 & 52576 &
+52576\tabularnewline
+numberNAs & 0 & 1581 & 1536 & 1555 & 1556 & 1653 & 1591 & 0 & 0 & 0 & 0
+& 1584 & 0 & 0 & 0\tabularnewline
+percentageNAs & 0\% & 3.01\% & 2.92\% & 2.96\% & 2.96\% & 3.14\% &
+3.03\% & 0\% & 0\% & 0\% & 0\% & 3.01\% & 0\% & 0\% & 0\%\tabularnewline
+naGapLongest & NA & 3 & 3 & 3 & 3 & 2 & 3 & NA & NA & NA & NA & 3 & NA &
+NA & NA\tabularnewline
+naGapMostFrequent & 52576 & 1 & 1 & 1 & 1 & 1 & 1 & 52576 & 52576 &
+52576 & 52576 & 1 & 52576 & 52576 & 52576\tabularnewline
+naGapMostOverallNAs & 52576 & 1 & 1 & 1 & 1 & 1 & 1 & 52576 & 52576 &
+52576 & 52576 & 1 & 52576 & 52576 & 52576\tabularnewline
+\bottomrule
+\end{longtable}
+
+TODO: Poprawić tabelkę, źle wygląda w PDF
+
+Analizując zaprezentowane podsumowania dla wszystkich atrybutów, możemy
+zauważyć że wartości puste stanowią mniej niż 3.5\% całego zbioru
+obserwacji. Ponadto ich rozkład ma charater losowy oraz są równomierne.
+W danych nie występują długie serie wartości pustych (sekwencje liczące
+dwie oraz trzy wartości puste są rzadkie). Wykorzystując wiedzę o
+charakterystyce danych możemy wykonać interpolację z wykorzystaniem
+filtru Kalmana, aby pozbyć się wartości pustych.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{without_outliers}\OperatorTok{$}\NormalTok{cfin1 <-}\StringTok{ }\KeywordTok{na_kalman}\NormalTok{(without_outliers}\OperatorTok{$}\NormalTok{cfin1)}
+\NormalTok{without_outliers}\OperatorTok{$}\NormalTok{cfin2 <-}\StringTok{ }\KeywordTok{na_kalman}\NormalTok{(without_outliers}\OperatorTok{$}\NormalTok{cfin2)}
+\NormalTok{without_outliers}\OperatorTok{$}\NormalTok{chel1 <-}\StringTok{ }\KeywordTok{na_kalman}\NormalTok{(without_outliers}\OperatorTok{$}\NormalTok{chel1)}
+\NormalTok{without_outliers}\OperatorTok{$}\NormalTok{chel2 <-}\StringTok{ }\KeywordTok{na_kalman}\NormalTok{(without_outliers}\OperatorTok{$}\NormalTok{chel2)}
+\NormalTok{without_outliers}\OperatorTok{$}\NormalTok{lcop1 <-}\StringTok{ }\KeywordTok{na_kalman}\NormalTok{(without_outliers}\OperatorTok{$}\NormalTok{lcop1)}
+\NormalTok{without_outliers}\OperatorTok{$}\NormalTok{lcop2 <-}\StringTok{ }\KeywordTok{na_kalman}\NormalTok{(without_outliers}\OperatorTok{$}\NormalTok{lcop2)}
+\NormalTok{without_outliers}\OperatorTok{$}\NormalTok{sst <-}\StringTok{ }\KeywordTok{na_kalman}\NormalTok{(without_outliers}\OperatorTok{$}\NormalTok{sst)}
+\end{Highlighting}
+\end{Shaded}
+
+TODO: Użyć jakieś funkcji
+
+\hypertarget{korelacja-atrybutuxf3w}{%
+\section{Korelacja atrybutów}\label{korelacja-atrybutuxf3w}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{'corrplot'}\NormalTok{)}
+
+\NormalTok{corelation_matrix <-}\StringTok{ }\KeywordTok{cor}\NormalTok{(without_outliers)}
+\KeywordTok{corrplot}\NormalTok{(corelation_matrix, }\DataTypeTok{method =} \StringTok{"circle"}\NormalTok{, }\DataTypeTok{title =} \StringTok{"Macierz korelacji"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Project_Herring_Analyze_files/figure-latex/korelacja-1.pdf}
+
+Na wykresie powyższym została przedstawiona macierz korelacji pomiędzy
+poszczególnymi atrybutami. Jak możemy zaobserwować, istnieje bardzo
+silna pozytywna korelacja pomiędzy parametrem \texttt{chel1} oraz
+\texttt{lcop1} (wynosząca w przybliżeniu \texttt{0.96}), a także
+\texttt{chel2} oraz \texttt{lcop2} (wynosząca \texttt{0.88}). Wynika z
+tego że występowanie planktonu \texttt{Calanus\ helgolandicus\ gat.\ 1}
+związane jest z obecnością \texttt{widłonogów\ gat.\ 1} i vice versa.
+Podobnie w przypadku planktonów drugiego gatunku czyli pary
+\texttt{Calanus\ helgolandicus\ gat.\ 2} oraz
+\texttt{widłonogi\ gat.\ 2}.
+
+Analizując dalej macierz korelacji możemy zaobserwować pozytywną
+zależność pomiędzy \texttt{cfin2} i \texttt{lcop2} wynosząca
+\texttt{0.65} - zagęszczenie \texttt{Calanus\ finmarchicus\ gat.\ 2} ma
+powiązanie w obecności \texttt{widłonogów\ gat.\ 2}.
+
+Ciekawą zależnością jest \texttt{sst} oraz \texttt{nao}. Korzystając z
+opisu \texttt{oscylacji\ północnoatlantyckiej} na stronie encyklopedii
+\href{https://pl.wikipedia.org/wiki/Oscylacja_p\%C3\%B3\%C5\%82nocnoatlantycka}{Wikipedia}
+mamy do czynienia ze zjawiskiem meterologicznym wpływającym na klimat,
+co manifestuje się między innymi zmianą temperatury. Podkreśla to
+wiarygodność naszych obserwacji, gdyż doszło do odwzorowania zjawiska
+fizycznego w naszych danych.
+
+Wysoką wartość zależności \texttt{fbar} oznaczającej
+\texttt{natężenia\ połowów\ w\ regionie} oraz \texttt{cumf} czyli
+\texttt{łączne\ roczne\ natężenie\ połowów\ w\ regionie} wynoszącej
+\texttt{0.82} można łatwo wyjaśnić. Łowienie w danym miejscu przez długi
+czas sumarycznie wpłynie na wysoką wartość drugiego parametru.
+
+Interesującą z punktu widzenia tematu raportu jest zależność temperatury
+przy powierzchni wody i długości złowionego śledzia. Wynosi ona
+\texttt{-0.45}. Większa temperatura ma odzwierciedlenie w mniejszych
+rozmiarach śledzi.
+
+TODO: Dodać wykresy dla porównań TODO: Poprawić ten opis aby dać tekst a
+nie same nazwy kolumn
+
+\hypertarget{zmiennoux15bux107-cech-w-ramach-nastux119pujux105cych-po-siebie-poux142owuxf3w}{%
+\section{Zmienność cech w ramach następujących po siebie
+połowów}\label{zmiennoux15bux107-cech-w-ramach-nastux119pujux105cych-po-siebie-poux142owuxf3w}}
+
+W kolejnych podrozdziałach zostanie przeanalizowana zmienność cech.
+Naszym celem jest wykrycie przyczyny spadku długości śledzi w połowach.
+
+\hypertarget{dux142ugoux15bux107-ux15bledzi}{%
+\subsection{Długość śledzi}\label{dux142ugoux15bux107-ux15bledzi}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{df_with_ids <-}\StringTok{ }\KeywordTok{mutate}\NormalTok{(without_outliers, }\DataTypeTok{id =} \KeywordTok{as.numeric}\NormalTok{(}\KeywordTok{rownames}\NormalTok{(without_outliers)))}
+\NormalTok{sampled_data <-}\StringTok{ }\KeywordTok{sample_n}\NormalTok{(df_with_ids, }\DecValTok{500}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{zmiana_sledzi_plot <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(}
+\NormalTok{  sampled_data,}
+  \KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{id, }\DataTypeTok{y=}\NormalTok{length)}
+\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x=}\KeywordTok{element_blank}\NormalTok{()) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_point}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{, }\DataTypeTok{colour =} \StringTok{"#f5ad00"}\NormalTok{, }\DataTypeTok{size =} \FloatTok{1.0}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{'Zmiana długości śledzia'}\NormalTok{) }\OperatorTok{+}\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{''}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylab}\NormalTok{(}\StringTok{'Długość [cm]'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_vline}\NormalTok{(}\DataTypeTok{xintercept =} \DecValTok{17000}\NormalTok{, }\DataTypeTok{colour=}\StringTok{"blue"}\NormalTok{, }\DataTypeTok{linetype =} \DecValTok{2}\NormalTok{, }\DataTypeTok{size =} \FloatTok{1.0}\NormalTok{)}
+
+\NormalTok{zmiana_sledzi_plot}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Project_Herring_Analyze_files/figure-latex/dlugosc-sledzi-1.pdf}
+
+TODO: Opisać wykres
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{'gganimate'}\NormalTok{)}
+\KeywordTok{library}\NormalTok{(}\StringTok{'gifski'}\NormalTok{)}
+
+\KeywordTok{ggplot}\NormalTok{(}
+\NormalTok{  sampled_data,}
+  \DataTypeTok{group =}\NormalTok{ xmonth,}
+  \KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{id, }\DataTypeTok{y=}\NormalTok{length)}
+\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{() }\OperatorTok{+}\StringTok{ }\KeywordTok{transition_reveal}\NormalTok{(id)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-1.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-2.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-3.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-4.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-5.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-6.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-7.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-8.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-9.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-10.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-11.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-12.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-13.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-14.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-15.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-16.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-17.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-18.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-19.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-20.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-21.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-22.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-23.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-24.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-25.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-26.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-27.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-28.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-29.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-30.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-31.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-32.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-33.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-34.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-35.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-36.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-37.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-38.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-39.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-40.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-41.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-42.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-43.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-44.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-45.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-46.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-47.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-48.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-49.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-50.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-51.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-52.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-53.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-54.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-55.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-56.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-57.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-58.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-59.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-60.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-61.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-62.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-63.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-64.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-65.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-66.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-67.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-68.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-69.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-70.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-71.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-72.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-73.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-74.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-75.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-76.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-77.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-78.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-79.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-80.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-81.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-82.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-83.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-84.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-85.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-86.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-87.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-88.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-89.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-90.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-91.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-92.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-93.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-94.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-95.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-96.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-97.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-98.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-99.pdf}
+\includegraphics{Project_Herring_Analyze_files/figure-latex/zmiana-rozmiaru-animacja-100.pdf}
+
+TODO: Źródło danych w postaci uśrednionych danych z połowów TODO: Opisać
+wykres
+
+\hypertarget{dostux119pnoux15bux107-pokarmu}{%
+\subsection{Dostępność pokarmu}\label{dostux119pnoux15bux107-pokarmu}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{'reshape2'}\NormalTok{)}
+
+\NormalTok{plancton_food <-}\StringTok{ }\KeywordTok{melt}\NormalTok{(sampled_data[, }\KeywordTok{c}\NormalTok{(}\DecValTok{16}\NormalTok{, }\DecValTok{2}\OperatorTok{:}\DecValTok{7}\NormalTok{)], }\DataTypeTok{id.vars =} \KeywordTok{c}\NormalTok{(}\StringTok{'id'}\NormalTok{), }\DataTypeTok{variable.name =} \StringTok{"TypPlanktonu"}\NormalTok{, }\DataTypeTok{value.name =} \StringTok{"Values"}\NormalTok{)}
+\KeywordTok{ggplot}\NormalTok{(}
+\NormalTok{  plancton_food,}
+  \KeywordTok{aes}\NormalTok{(id, Values, }\DataTypeTok{color =}\NormalTok{ TypPlanktonu)}
+\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x=}\KeywordTok{element_blank}\NormalTok{()) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{'Zmiana dostępności pokarmu'}\NormalTok{) }\OperatorTok{+}\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{''}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylab}\NormalTok{(}\StringTok{'Dostępność pokarmu [zagęszczenie]'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_vline}\NormalTok{(}\DataTypeTok{xintercept =} \DecValTok{17000}\NormalTok{, }\DataTypeTok{colour=}\StringTok{"blue"}\NormalTok{, }\DataTypeTok{linetype =} \DecValTok{2}\NormalTok{, }\DataTypeTok{size =} \FloatTok{1.0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Project_Herring_Analyze_files/figure-latex/dostepnosc-pokarmu-1.pdf}
+
+TODO: Opisać wykres
+
+\hypertarget{parametry-ux15brodowiska}{%
+\subsection{Parametry środowiska}\label{parametry-ux15brodowiska}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{parametry_srodowiska <-}\StringTok{ }\NormalTok{sampled_data[, }\KeywordTok{c}\NormalTok{(}\DecValTok{12}\NormalTok{, }\DecValTok{13}\NormalTok{, }\DecValTok{15}\NormalTok{)]}
+\NormalTok{normalized_environment <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{lapply}\NormalTok{(parametry_srodowiska, }\ControlFlowTok{function}\NormalTok{(x) \{}
+\NormalTok{  (x }\OperatorTok{-}\StringTok{ }\KeywordTok{min}\NormalTok{(x)) }\OperatorTok{/}\StringTok{ }\NormalTok{(}\KeywordTok{max}\NormalTok{(x) }\OperatorTok{-}\StringTok{ }\KeywordTok{min}\NormalTok{(x))}
+\NormalTok{\}))}
+\NormalTok{normalized_environment[}\StringTok{"id"}\NormalTok{] <-}\StringTok{ }\NormalTok{sampled_data[, }\DecValTok{16}\NormalTok{]}
+
+\NormalTok{environment <-}\StringTok{ }\KeywordTok{melt}\NormalTok{(normalized_environment, }\DataTypeTok{id.vars =} \KeywordTok{c}\NormalTok{(}\StringTok{'id'}\NormalTok{), }\DataTypeTok{variable.name =} \StringTok{"Środowisko"}\NormalTok{, }\DataTypeTok{value.name =} \StringTok{"Values"}\NormalTok{)}
+\KeywordTok{ggplot}\NormalTok{(}
+\NormalTok{  environment,}
+  \KeywordTok{aes}\NormalTok{(id, Values, }\DataTypeTok{color =}\NormalTok{ Środowisko)}
+\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x=}\KeywordTok{element_blank}\NormalTok{()) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{'Zmiana warunków środowiska'}\NormalTok{) }\OperatorTok{+}\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{''}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylab}\NormalTok{(}\StringTok{'Środowisko (znormalizowana wartość)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_vline}\NormalTok{(}\DataTypeTok{xintercept =} \DecValTok{17000}\NormalTok{, }\DataTypeTok{colour=}\StringTok{"blue"}\NormalTok{, }\DataTypeTok{linetype =} \DecValTok{2}\NormalTok{, }\DataTypeTok{size =} \FloatTok{1.0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Project_Herring_Analyze_files/figure-latex/srodowisko-1.pdf}
+
+TODO: Opisać wykres
+
+\hypertarget{eksploatacja-ux142owiska}{%
+\subsection{Eksploatacja łowiska}\label{eksploatacja-ux142owiska}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{parametry_lowiska <-}\StringTok{ }\NormalTok{sampled_data[, }\KeywordTok{c}\NormalTok{(}\DecValTok{8}\OperatorTok{:}\DecValTok{11}\NormalTok{)]}
+\NormalTok{normalized_lowisko <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{lapply}\NormalTok{(parametry_lowiska, }\ControlFlowTok{function}\NormalTok{(x) \{}
+\NormalTok{  (x }\OperatorTok{-}\StringTok{ }\KeywordTok{min}\NormalTok{(x)) }\OperatorTok{/}\StringTok{ }\NormalTok{(}\KeywordTok{max}\NormalTok{(x) }\OperatorTok{-}\StringTok{ }\KeywordTok{min}\NormalTok{(x))}
+\NormalTok{\}))}
+\NormalTok{normalized_lowisko[}\StringTok{"id"}\NormalTok{] <-}\StringTok{ }\NormalTok{sampled_data[, }\DecValTok{16}\NormalTok{]}
+
+\NormalTok{lowisko <-}\StringTok{ }\KeywordTok{melt}\NormalTok{(normalized_lowisko, }\DataTypeTok{id.vars =} \KeywordTok{c}\NormalTok{(}\StringTok{'id'}\NormalTok{), }\DataTypeTok{variable.name =} \StringTok{"Łowisko"}\NormalTok{, }\DataTypeTok{value.name =} \StringTok{"Values"}\NormalTok{)}
+\KeywordTok{ggplot}\NormalTok{(}
+\NormalTok{  lowisko,}
+  \KeywordTok{aes}\NormalTok{(id, Values, }\DataTypeTok{color =}\NormalTok{ Łowisko)}
+\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{theme_bw}\NormalTok{() }\OperatorTok{+}\StringTok{ }
+\StringTok{  }\KeywordTok{theme}\NormalTok{(}\DataTypeTok{axis.text.x=}\KeywordTok{element_blank}\NormalTok{()) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_smooth}\NormalTok{(}\DataTypeTok{se =} \OtherTok{FALSE}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ggtitle}\NormalTok{(}\StringTok{'Zmiana warunków eksploracji łowiska'}\NormalTok{) }\OperatorTok{+}\StringTok{  }\KeywordTok{xlab}\NormalTok{(}\StringTok{''}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{ylab}\NormalTok{(}\StringTok{'Łowisko (znormalizowana wartość)'}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{geom_vline}\NormalTok{(}\DataTypeTok{xintercept =} \DecValTok{17000}\NormalTok{, }\DataTypeTok{colour=}\StringTok{"blue"}\NormalTok{, }\DataTypeTok{linetype =} \DecValTok{2}\NormalTok{, }\DataTypeTok{size =} \FloatTok{1.0}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{Project_Herring_Analyze_files/figure-latex/lowisko-1.pdf}
+
+TODO: Opisać wykres
+
+\hypertarget{regresor---predykcja}{%
+\section{Regresor - predykcja}\label{regresor---predykcja}}
+
+TODO: Dwa regresory TODO: Wskazanie najważniejszych cech TODO:
+Obliczenie błędów
 
 
 \end{document}

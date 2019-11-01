@@ -3,13 +3,13 @@ title: "Eksploracja Masywnych Danych - Analiza danych"
 author: "Kajetan Zimniak & Bartosz Górka"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-  pdf_document: 
-    toc: true
   md_document:
     variant: markdown_github
   html_document:
     toc: true
     df_print: paged
+  pdf_document: 
+    toc: true
 ---
 ```{r setup, include=FALSE}
 pdf.options(encoding = 'CP1250')
@@ -25,6 +25,9 @@ TODO: Podsumowanie na koniec
 * `tidyverse`
 * `ggplot2`
 * `gridExtra`
+* `imputeTS`
+* `corrplot`
+* `reshape2`
 
 # Ustawienie ziarna generatora
 Celem zapewnienia powtarzalności operacji losowania, a co za tym idzie powtarzalności wyników przy każdym uruchomieniu raportu na tych samych danych zastosowano ziarno generatora o wartości `102019`.
@@ -94,6 +97,7 @@ content %>%
   summary() %>%
   kable(align = 'c', caption = 'Statystyka zbioru danych')
 ```
+
 TODO: Poprawić tabelkę, nie mieści się na stronie PDF
 
 ## Rozkład wartości cech
@@ -184,6 +188,8 @@ grid.arrange(plot_sst, plot_sal, plot_xmonth, plot_nao, nrow = 2)
 
 Analizując przedstawione wykresy dotyczące poszczególnych atrybutów opisujących połowy możemy zaobserwować rozkład zbliżony do normalnego dla wielu z nich (chociażby parametr długości śledzia). W przypadku parametrów dostępności planktonu *Calanus finmarchicus gat. 1* oraz *Widłonogów gat. 1* obserwujemy występowanie drobnej próbki danych odbierających znacząco od reszty. Na potrzeby dalszego przetwarzania dane zostaną oczyszczone z tych obserwacji odstających.
 
+TODO: Można opisać pozostałe wykresy bazując na danych w tabeli poprzedniej (min, max ...)
+
 ```{r obserwacje-odstajace}
 without_outliers =
   content %>%
@@ -205,5 +211,143 @@ grid.arrange(plot_cfin1_clear, plot_lcop1_clear, nrow = 1)
 ```
 
 # Przetwarzanie brakujących danych
-TODO: Analiza jakie atrybuty oraz liczność
-TODO: Uśrednienie wartości bazując na rozkładzie
+Korzystajac z pakietu `imputeTS` i funkcji `statsNA` możemy przeprowadzić analizę wartości pustych w poszczególnych obserwacjach.
+```{r analiza-wartosci-na, message = FALSE, warnings = FALSE}
+library('imputeTS')
+
+without_outliers %>%
+  colnames() %>%
+  sapply(function(attr) {
+    statsNA(without_outliers[[attr]], printOnly = FALSE)
+  }) %>%
+  kable()
+```
+
+TODO: Poprawić tabelkę, źle wygląda w PDF
+
+Analizując zaprezentowane podsumowania dla wszystkich atrybutów, możemy zauważyć że wartości puste stanowią mniej niż 3.5% całego zbioru obserwacji. Ponadto ich rozkład ma charater losowy oraz są równomierne. W danych nie występują długie serie wartości pustych (sekwencje liczące dwie oraz trzy wartości puste są rzadkie). Wykorzystując wiedzę o charakterystyce danych możemy wykonać interpolację z wykorzystaniem filtru Kalmana, aby pozbyć się wartości pustych.
+
+```{r kalman}
+without_outliers$cfin1 <- na_kalman(without_outliers$cfin1)
+without_outliers$cfin2 <- na_kalman(without_outliers$cfin2)
+without_outliers$chel1 <- na_kalman(without_outliers$chel1)
+without_outliers$chel2 <- na_kalman(without_outliers$chel2)
+without_outliers$lcop1 <- na_kalman(without_outliers$lcop1)
+without_outliers$lcop2 <- na_kalman(without_outliers$lcop2)
+without_outliers$sst <- na_kalman(without_outliers$sst)
+```
+
+TODO: Użyć jakieś funkcji
+
+# Korelacja atrybutów
+```{r korelacja, message = FALSE, warnings = FALSE}
+library('corrplot')
+
+corelation_matrix <- cor(without_outliers)
+corrplot(corelation_matrix, method = "circle", title = "Macierz korelacji")
+```
+
+Na wykresie powyższym została przedstawiona macierz korelacji pomiędzy poszczególnymi atrybutami. Jak możemy zaobserwować, istnieje bardzo silna pozytywna korelacja pomiędzy parametrem `chel1` oraz `lcop1` (wynosząca w przybliżeniu `0.96`), a także `chel2` oraz `lcop2` (wynosząca `0.88`). Wynika z tego że występowanie planktonu `Calanus helgolandicus gat. 1` związane jest z obecnością `widłonogów gat. 1` i vice versa. Podobnie w przypadku planktonów drugiego gatunku czyli pary `Calanus helgolandicus gat. 2` oraz `widłonogi gat. 2`.
+
+Analizując dalej macierz korelacji możemy zaobserwować pozytywną zależność pomiędzy `cfin2` i `lcop2` wynosząca `0.65` - zagęszczenie `Calanus finmarchicus gat. 2` ma powiązanie w obecności `widłonogów gat. 2`.
+
+Ciekawą zależnością jest `sst` oraz `nao`. Korzystając z opisu `oscylacji północnoatlantyckiej` na stronie encyklopedii [Wikipedia](https://pl.wikipedia.org/wiki/Oscylacja_p%C3%B3%C5%82nocnoatlantycka) mamy do czynienia ze zjawiskiem meterologicznym wpływającym na klimat, co manifestuje się między innymi zmianą temperatury. Podkreśla to wiarygodność naszych obserwacji, gdyż doszło do odwzorowania zjawiska fizycznego w naszych danych.
+
+Wysoką wartość zależności `fbar` oznaczającej `natężenia połowów w regionie` oraz `cumf` czyli `łączne roczne natężenie połowów w regionie` wynoszącej `0.82` można łatwo wyjaśnić. Łowienie w danym miejscu przez długi czas sumarycznie wpłynie na wysoką wartość drugiego parametru.
+
+Interesującą z punktu widzenia tematu raportu jest zależność temperatury przy powierzchni wody i długości złowionego śledzia. Wynosi ona `-0.45`. Większa temperatura ma odzwierciedlenie w mniejszych rozmiarach śledzi.
+
+TODO: Dodać wykresy dla porównań
+TODO: Poprawić ten opis aby dać tekst a nie same nazwy kolumn
+
+# Zmienność cech w ramach następujących po siebie połowów
+W kolejnych podrozdziałach zostanie przeanalizowana zmienność cech. Naszym celem jest wykrycie przyczyny spadku długości śledzi w połowach.
+
+## Długość śledzi
+```{r, ECHO = FALSE, CACHE = TRUE}
+df_with_ids <- mutate(without_outliers, id = as.numeric(rownames(without_outliers)))
+sampled_data <- sample_n(df_with_ids, 500)
+```
+
+```{r, dlugosc-sledzi, message = FALSE, warnings = FALSE}
+zmiana_sledzi_plot <- ggplot(
+  sampled_data,
+  aes(x=id, y=length)
+) + theme_bw() + 
+  theme(axis.text.x=element_blank()) + geom_point() + geom_smooth(method = 'loess', formula = y ~ x, se = FALSE, colour = "#f5ad00", size = 1.0) + ggtitle('Zmiana długości śledzia') +  xlab('') + ylab('Długość [cm]') + geom_vline(xintercept = 17000, colour="blue", linetype = 2, size = 1.0)
+
+zmiana_sledzi_plot
+```
+
+TODO: Opisać wykres
+
+```{r zmiana-rozmiaru-animacja}
+library('gganimate')
+library('gifski')
+
+ggplot(
+  sampled_data,
+  group = xmonth,
+  aes(x=id, y=length)
+) + theme_bw() + 
+  geom_line() + transition_reveal(id)
+```
+
+TODO: Źródło danych w postaci uśrednionych danych z połowów
+TODO: Opisać wykres
+TODO: W PDF bez tej animacji
+
+## Dostępność pokarmu
+```{r, dostepnosc-pokarmu, message = FALSE, warnings = FALSE}
+library('reshape2')
+
+plancton_food <- melt(sampled_data[, c(16, 2:7)], id.vars = c('id'), variable.name = "TypPlanktonu", value.name = "Values")
+ggplot(
+  plancton_food,
+  aes(id, Values, color = TypPlanktonu)
+) + theme_bw() + 
+  theme(axis.text.x=element_blank()) + geom_smooth(se = FALSE) + ggtitle('Zmiana dostępności pokarmu') +  xlab('') + ylab('Dostępność pokarmu [zagęszczenie]') + geom_vline(xintercept = 17000, colour="blue", linetype = 2, size = 1.0)
+```
+
+TODO: Opisać wykres
+
+## Parametry środowiska
+```{r, srodowisko, message = FALSE, warnings = FALSE}
+parametry_srodowiska <- sampled_data[, c(12, 13, 15)]
+normalized_environment <- as.data.frame(lapply(parametry_srodowiska, function(x) {
+  (x - min(x)) / (max(x) - min(x))
+}))
+normalized_environment["id"] <- sampled_data[, 16]
+
+environment <- melt(normalized_environment, id.vars = c('id'), variable.name = "Środowisko", value.name = "Values")
+ggplot(
+  environment,
+  aes(id, Values, color = Środowisko)
+) + theme_bw() + 
+  theme(axis.text.x=element_blank()) + geom_smooth(se = FALSE) + ggtitle('Zmiana warunków środowiska') +  xlab('') + ylab('Środowisko (znormalizowana wartość)') + geom_vline(xintercept = 17000, colour="blue", linetype = 2, size = 1.0)
+```
+
+TODO: Opisać wykres
+
+## Eksploatacja łowiska
+```{r, lowisko, message = FALSE, warnings = FALSE}
+parametry_lowiska <- sampled_data[, c(8:11)]
+normalized_lowisko <- as.data.frame(lapply(parametry_lowiska, function(x) {
+  (x - min(x)) / (max(x) - min(x))
+}))
+normalized_lowisko["id"] <- sampled_data[, 16]
+
+lowisko <- melt(normalized_lowisko, id.vars = c('id'), variable.name = "Łowisko", value.name = "Values")
+ggplot(
+  lowisko,
+  aes(id, Values, color = Łowisko)
+) + theme_bw() + 
+  theme(axis.text.x=element_blank()) + geom_smooth(se = FALSE) + ggtitle('Zmiana warunków eksploracji łowiska') +  xlab('') + ylab('Łowisko (znormalizowana wartość)') + geom_vline(xintercept = 17000, colour="blue", linetype = 2, size = 1.0)
+```
+
+TODO: Opisać wykres
+
+# Regresor - predykcja 
+TODO: Dwa regresory
+TODO: Wskazanie najważniejszych cech
+TODO: Obliczenie błędów
