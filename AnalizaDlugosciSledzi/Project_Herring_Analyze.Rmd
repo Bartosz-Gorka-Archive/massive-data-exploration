@@ -2,6 +2,7 @@
 title: 'Eksploracja Masywnych Danych - Analiza danych'
 author: 'Kajetan Zimniak & Bartosz Górka'
 date: '`r format(Sys.time(), "%d %B, %Y")`'
+always_allow_html: true
 output:
   md_document:
     variant: markdown_github
@@ -481,7 +482,7 @@ ggplot(varImp(model_linear_preproc))
 
 Ostatnim modelem będzie `eXtreme Gradient Boosting`. W ramach uczenia zastosujemy macierz parametrów.
 
-```{r xgb-linear, cache = TRUE}
+```{r xgb linear, cache = TRUE}
 grid = expand.grid(
   nrounds = c(10, 20, 50, 100),
   alpha = c(1, 0.7, 0.3, 0.1, 0),
@@ -496,14 +497,14 @@ model_xgb <- train(length ~ ., data = trainingSet, method = "xgbLinear",
 predicted_xgb <- predict(model_xgb, newdata = testSet)
 predicted_xgb <- sapply(predicted_xgb, round, digits = 0)
 
-expected_values <- sapply(testSet$length, round, digits = 0)
-levels <- unique(c(expected_values, predicted_xgb))
+expected_values_xgb <- sapply(testSet$length, round, digits = 0)
+levels_xgb <- unique(c(expected_values_xgb, predicted_xgb))
 
-result <- confusionMatrix(data = factor(predicted_xgb, levels = levels),
-                factor(expected_values, levels = levels))
+result_xgb <- confusionMatrix(data = factor(predicted_xgb, levels = levels_xgb),
+                factor(expected_values_xgb, levels = levels_xgb))
 ```
-```{r wyniki-xgb, echo = FALSE, cache = TRUE}
-kable(result$overall)
+```{r wyniki xgb, echo = FALSE, cache = TRUE}
+kable(result_xgb$overall)
 kable(model_xgb$bestTune)
 ggplot(varImp(model_xgb))
 ```
