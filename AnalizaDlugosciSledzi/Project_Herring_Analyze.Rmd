@@ -30,6 +30,7 @@ Ostatnim krokiem było przygotowanie trzech modeli regresji próbujących przewi
 * `knitr`
 * `kableExtra`
 * `dplyr`
+* `plotly`
 * `tidyverse`
 * `ggplot2`
 * `gridExtra`
@@ -43,6 +44,7 @@ Ostatnim krokiem było przygotowanie trzech modeli regresji próbujących przewi
 ```{r wczytanie bibliotek, echo = FALSE, message = FALSE, warning = FALSE}
 library("knitr")
 library("kableExtra")
+library("plotly")
 library("dplyr")
 library("tidyverse")
 library("ggplot2")
@@ -340,25 +342,16 @@ sampled_data <- sample_n(df_with_ids, 500)
 ```
 
 ```{r dlugosc sledzi zmiana, message = FALSE, warnings = FALSE, cache = TRUE}
-ggplot(sampled_data, aes(x=id, y=length)) + theme_bw() + geom_point() +
+plot_zmiana_rozmiaru <- ggplot(sampled_data, aes(x=id, y=length)) + theme_bw() + geom_point() +
   theme(axis.text.x=element_blank()) + ylab("Długość [cm]") + xlab("Zmiana w czasie") +
   geom_smooth(method = "loess", formula = y ~ x, se = FALSE, colour = "#f5ad00",
               size = 1.0) + ggtitle("Zmiana długości śledzia") +
   geom_vline(xintercept = 17000, colour="blue", linetype = 2, size = 1.0)
+
+plot_zmiana_rozmiaru
 ```
 
-Z wykresu przestawiającego zmianę długości śledzi w czasie, możemy zaobserwować odwrócenie tendencji. Na początku rozmiar wzrastał z około `24,5 cm` do `26 cm` aby następnie spaść poniżej `23,5 cm`. Za pomocą niebieskiej linii oznaczono punkt przed rozpoczęciem spadku. Moment w czasie (na podstawie historii obserwacji) zostanie wykorzystany jako punkt referencyjny w kolejnych wykresach.
-
-```{r zmiana rozmiaru sledzia animacja, fig.show="hide", cache = TRUE}
-ggplot(
-  sampled_data,
-  group = xmonth,
-  aes(x=id, y=length)
-) + theme_bw() + 
-  geom_line() + transition_reveal(id)
-```
-
-TODO: W MD i HTML animacja, w PDF bez
+Z wykresu przestawiającego zmianę długości śledzi w czasie, możemy zaobserwować odwrócenie tendencji. Na początku rozmiar wzrastał z około `24,5 cm` do `26 cm`, aby następnie spaść poniżej `23,5 cm`. Za pomocą niebieskiej linii oznaczono punkt przed rozpoczęciem spadku. Moment w czasie (na podstawie historii obserwacji) zostanie wykorzystany jako punkt referencyjny w kolejnych wykresach.
 
 ## Dostępność pokarmu
 ```{r dostepnosc pokarmu, message = FALSE, warnings = FALSE, cache = TRUE}
@@ -441,8 +434,12 @@ levels <- unique(c(expected_values, predicted_linear_regression))
 result <- confusionMatrix(data = factor(predicted_linear_regression, levels = levels),
                 factor(expected_values, levels = levels))
 ```
-```{r wyniki-lm, echo = FALSE, cache = TRUE}
+
+```{r wyniki lm overall, echo = FALSE, cache = TRUE}
 kable(result$overall)
+```
+
+```{r wyniki lm ggplot, echo = FALSE, cache = TRUE}
 ggplot(varImp(model_linear_regression))
 ```
 
@@ -475,8 +472,12 @@ levels <- unique(c(expected_values, predicted_linear_preproc))
 result <- confusionMatrix(data = factor(predicted_linear_preproc, levels = levels),
                 factor(expected_values, levels = levels))
 ```
+
 ```{r wyniki-lm-selected, echo = FALSE, cache = TRUE}
 kable(result$overall)
+```
+
+```{r wyniki-lm-selected-wykres, echo = FALSE, cache = TRUE}
 ggplot(varImp(model_linear_preproc))
 ```
 
@@ -503,9 +504,16 @@ levels_xgb <- unique(c(expected_values_xgb, predicted_xgb))
 result_xgb <- confusionMatrix(data = factor(predicted_xgb, levels = levels_xgb),
                 factor(expected_values_xgb, levels = levels_xgb))
 ```
-```{r wyniki xgb, echo = FALSE, cache = TRUE}
+
+```{r wyniki xgb overall, echo = FALSE, cache = TRUE}
 kable(result_xgb$overall)
+```
+
+```{r wyniki xgb bestTune, echo = FALSE, cache = TRUE}
 kable(model_xgb$bestTune)
+```
+
+```{r wyniki xgb ggplot, echo = FALSE, cache = TRUE}
 ggplot(varImp(model_xgb))
 ```
 
@@ -518,6 +526,9 @@ resampled_models <-
 stats <- summary(resampled_models)
 
 stats$statistics %>% kable(align = "c", caption = "Porównanie regresorów")
+```
+
+```{r porownanie modeli dotplot, cache = TRUE}
 dotplot(resampled_models, metric = "RMSE")
 ```
 
