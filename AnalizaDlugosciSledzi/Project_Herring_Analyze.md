@@ -28,6 +28,7 @@ Wykorzystane biblioteki
 -   `knitr`
 -   `kableExtra`
 -   `dplyr`
+-   `plotly`
 -   `tidyverse`
 -   `ggplot2`
 -   `gridExtra`
@@ -889,8 +890,8 @@ Rozkład wartości cech
 ---------------------
 
 ``` r
-ggplot(content, aes(x = length)) + geom_histogram(binwidth = 0.25) + 
-  theme_bw() + ggtitle("Długość złowionego śledzia [cm]") + 
+ggplot(content, aes(x = length)) + geom_histogram(binwidth = 0.25) +
+  theme_bw() + ggtitle("Długość złowionego śledzia [cm]") +
   xlab(sprintf("Długość [cm]")) + ylab("Liczba obserwacji")
 ```
 
@@ -905,7 +906,7 @@ plot_cfin1 <- ggplot(content, aes(x = cfin1)) + geom_histogram(binwidth = 1.0) +
   xlab(sprintf("Zagęszczenie planktonu [j]")) + ylab("Liczba obserwacji")
 
 plot_cfin2 <- ggplot(content, aes(x = cfin2)) + geom_histogram(binwidth = 1.0) +
-  theme_bw() + ggtitle("Calanus finmarchicus gat. 2") + 
+  theme_bw() + ggtitle("Calanus finmarchicus gat. 2") +
   xlab(sprintf("Zagęszczenie planktonu [j]")) + ylab("Liczba obserwacji")
 
 grid.arrange(plot_cfin1, plot_cfin2, nrow = 1)
@@ -922,11 +923,11 @@ analizie.
 
 ``` r
 plot_chel1 <- ggplot(content, aes(x = chel1)) + geom_histogram(binwidth = 0.5) +
-  theme_bw() + ggtitle("Calanus helgolandicus gat. 1") + 
+  theme_bw() + ggtitle("Calanus helgolandicus gat. 1") +
   xlab(sprintf("Zagęszczenie planktonu [j]")) + ylab("Liczba obserwacji")
 
 plot_chel2 <- ggplot(content, aes(x = chel2)) + geom_histogram(binwidth = 0.5) +
-  theme_bw() + ggtitle("Calanus helgolandicus gat. 2") + 
+  theme_bw() + ggtitle("Calanus helgolandicus gat. 2") +
   xlab(sprintf("Zagęszczenie planktonu [j]")) + ylab("Liczba obserwacji")
 
 grid.arrange(plot_chel1, plot_chel2, nrow = 1)
@@ -943,11 +944,11 @@ jednakże mniej skupiony w okolicach zera, a bardziej rozproszony
 
 ``` r
 plot_lcop1 <- ggplot(content, aes(x = lcop1)) + geom_histogram(binwidth = 0.5) +
-  theme_bw() + ggtitle("Widłonogi gat. 1") + 
+  theme_bw() + ggtitle("Widłonogi gat. 1") +
   xlab(sprintf("Zagęszczenie planktonu [j]")) + ylab("Liczba obserwacji")
 
 plot_lcop2 <- ggplot(content, aes(x = lcop2)) + geom_histogram(binwidth = 0.5) +
-  theme_bw() + ggtitle("Widłonogi gat. 2") + 
+  theme_bw() + ggtitle("Widłonogi gat. 2") +
   xlab(sprintf("Zagęszczenie planktonu [j]")) + ylab("Liczba obserwacji")
 
 grid.arrange(plot_lcop1, plot_lcop2, nrow = 1)
@@ -961,19 +962,19 @@ osiąga rozkład mniej skupiony wokół jednej wartości.
 
 ``` r
 plot_fbar <- ggplot(content, aes(x = fbar)) + geom_histogram(binwidth = 0.05) +
-  theme_bw() + ggtitle("Natężenie połowów") + 
+  theme_bw() + ggtitle("Natężenie połowów") +
   xlab(sprintf("Ułamek pozostawionego narybku")) + ylab("Liczba obserwacji")
 
 plot_recr <- ggplot(content, aes(x = recr)) + geom_histogram(binwidth = 50000.0) +
-  theme_bw() + ggtitle("Roczny narybek") + 
+  theme_bw() + ggtitle("Roczny narybek") +
   xlab(sprintf("Liczba śledzi")) + ylab("Liczba obserwacji")
 
 plot_cumf <- ggplot(content, aes(x = cumf)) + geom_histogram(binwidth = 0.02) +
-  theme_bw() + ggtitle("Łączne roczne natężenie połowów") + 
+  theme_bw() + ggtitle("Łączne roczne natężenie połowów") +
   xlab(sprintf("Ułamek pozostawionego narybku")) + ylab("Liczba obserwacji")
 
 plot_totaln <- ggplot(content, aes(x = totaln)) + geom_histogram(binwidth = 1000.0) +
-  theme_bw() + ggtitle("Łączna liczba złowionych ryb") + 
+  theme_bw() + ggtitle("Łączna liczba złowionych ryb") +
   xlab(sprintf("Liczba śledzi")) + ylab("Liczba obserwacji")
 
 grid.arrange(plot_fbar, plot_recr, plot_cumf, plot_totaln, nrow = 2)
@@ -983,19 +984,19 @@ grid.arrange(plot_fbar, plot_recr, plot_cumf, plot_totaln, nrow = 2)
 
 ``` r
 plot_sst <- ggplot(content, aes(x = sst)) + geom_histogram(binwidth = 0.1) +
-  theme_bw() + ggtitle("Temperatura przy powierzchni wody") + 
+  theme_bw() + ggtitle("Temperatura przy powierzchni wody") +
   xlab(sprintf("Temperatura")) + ylab("Liczba obserwacji")
 
 plot_sal <- ggplot(content, aes(x = sal)) + geom_histogram(binwidth = 0.01) +
-  theme_bw() + ggtitle("Poziom zasolenia wody") + 
+  theme_bw() + ggtitle("Poziom zasolenia wody") +
   xlab(sprintf("Zasolenie wody")) + ylab("Liczba obserwacji")
 
 plot_xmonth <- ggplot(content, aes(x = xmonth)) + geom_histogram(binwidth = 0.5) +
-  theme_bw() + ggtitle("Miesic połowu") + 
+  theme_bw() + ggtitle("Miesic połowu") +
   xlab(sprintf("Miesiąc")) + ylab("Liczba obserwacji")
 
 plot_nao <- ggplot(content, aes(x = nao)) + geom_histogram(binwidth = 0.5) +
-  theme_bw() + ggtitle("Oscylacja północnoatlantycka") + 
+  theme_bw() + ggtitle("Oscylacja północnoatlantycka") +
   xlab(sprintf("Oscylacja")) + ylab("Liczba obserwacji")
 
 grid.arrange(plot_sst, plot_sal, plot_xmonth, plot_nao, nrow = 2)
@@ -1540,32 +1541,23 @@ Długość śledzi
 --------------
 
 ``` r
-ggplot(sampled_data, aes(x=id, y=length)) + theme_bw() + geom_point() +
+plot_zmiana_rozmiaru <- ggplot(sampled_data, aes(x=id, y=length)) + theme_bw() + geom_point() +
   theme(axis.text.x=element_blank()) + ylab("Długość [cm]") + xlab("Zmiana w czasie") +
   geom_smooth(method = "loess", formula = y ~ x, se = FALSE, colour = "#f5ad00",
               size = 1.0) + ggtitle("Zmiana długości śledzia") +
   geom_vline(xintercept = 17000, colour="blue", linetype = 2, size = 1.0)
+
+plot_zmiana_rozmiaru
 ```
 
 ![](Project_Herring_Analyze_files/figure-markdown_github/dlugosc%20sledzi%20zmiana-1.png)
 
 Z wykresu przestawiającego zmianę długości śledzi w czasie, możemy
 zaobserwować odwrócenie tendencji. Na początku rozmiar wzrastał z około
-`24,5 cm` do `26 cm` aby następnie spaść poniżej `23,5 cm`. Za pomocą
+`24,5 cm` do `26 cm`, aby następnie spaść poniżej `23,5 cm`. Za pomocą
 niebieskiej linii oznaczono punkt przed rozpoczęciem spadku. Moment w
 czasie (na podstawie historii obserwacji) zostanie wykorzystany jako
 punkt referencyjny w kolejnych wykresach.
-
-``` r
-ggplot(
-  sampled_data,
-  group = xmonth,
-  aes(x=id, y=length)
-) + theme_bw() + 
-  geom_line() + transition_reveal(id)
-```
-
-TODO: W MD i HTML animacja, w PDF bez
 
 Dostępność pokarmu
 ------------------
@@ -1744,7 +1736,8 @@ NaN
 </tr>
 </tbody>
 </table>
-![](Project_Herring_Analyze_files/figure-markdown_github/wyniki-lm-1.png)
+
+![](Project_Herring_Analyze_files/figure-markdown_github/wyniki%20lm%20ggplot-1.png)
 
 W ramach eksperymentu, jako zbiór danych zastosujemy oryginalny zbiór
 danych z pominięciem charakterystyk dotyczących połowu na łowiskach:
@@ -1771,7 +1764,7 @@ danych z pominięciem charakterystyk dotyczących połowu na łowiskach:
 model_linear_preproc <- train(length ~ ., data = trainingSet[, -c(8:11)],
                                  method = "lm", trControl = ctrl)
 
-predicted_linear_preproc <- 
+predicted_linear_preproc <-
   model_linear_preproc %>%
   predict(newdata = testSet[, -c(8:11)]) %>%
   sapply(round, digits = 0)
@@ -1852,7 +1845,8 @@ NaN
 </tr>
 </tbody>
 </table>
-![](Project_Herring_Analyze_files/figure-markdown_github/wyniki-lm-selected-1.png)
+
+![](Project_Herring_Analyze_files/figure-markdown_github/wyniki-lm-selected-wykres-1.png)
 
 Ostatnim modelem będzie `eXtreme Gradient Boosting`. W ramach uczenia
 zastosujemy macierz parametrów.
@@ -1987,13 +1981,14 @@ eta
 </tr>
 </tbody>
 </table>
-![](Project_Herring_Analyze_files/figure-markdown_github/wyniki%20xgb-1.png)
+
+![](Project_Herring_Analyze_files/figure-markdown_github/wyniki%20xgb%20ggplot-1.png)
 
 Porównanie modeli
 -----------------
 
 ``` r
-resampled_models <- 
+resampled_models <-
   list(linear = model_linear_regression,
        linear_preprocess = model_linear_preproc,
        xgb = model_xgb) %>% resamples()
@@ -2344,11 +2339,12 @@ xgb
 </tr>
 </tbody>
 </table>
+
 ``` r
 dotplot(resampled_models, metric = "RMSE")
 ```
 
-![](Project_Herring_Analyze_files/figure-markdown_github/porownanie%20modeli-1.png)
+![](Project_Herring_Analyze_files/figure-markdown_github/porownanie%20modeli%20dotplot-1.png)
 
 Do porównania regresorów użyto miary `RMSE`, której im mniejsza wartość,
 tym lepiej. Najlepszym z regresorów okazał się `xgbLinear`. Biorąc pod
