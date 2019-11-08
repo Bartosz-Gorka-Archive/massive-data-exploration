@@ -896,6 +896,7 @@ ggplot(content, aes(x = length)) + geom_histogram(binwidth = 0.25) +
 ```
 
 ![](Project_Herring_Analyze_files/figure-markdown_github/dlugosc%20sledzia-1.png)
+
 Jak możemy zaobserwować, większość śledzi w połowie ma długość od 23 do
 27 centymetrów. Mamy do czynienia z rozkładem bardzo zbliżonym do
 rozkładu normalnego.
@@ -1547,7 +1548,7 @@ plot_zmiana_rozmiaru <- ggplot(sampled_data, aes(x=id, y=length)) + theme_bw() +
               size = 1.0) + ggtitle("Zmiana długości śledzia") +
   geom_vline(xintercept = 17000, colour="blue", linetype = 2, size = 1.0)
 
-plot_zmiana_rozmiaru
+ggplotly(plot_zmiana_rozmiaru)
 ```
 
 ![](Project_Herring_Analyze_files/figure-markdown_github/dlugosc%20sledzi%20zmiana-1.png)
@@ -1683,7 +1684,7 @@ x
 Accuracy
 </td>
 <td style="text-align:right;">
-0.2877577
+0.2851708
 </td>
 </tr>
 <tr>
@@ -1691,7 +1692,7 @@ Accuracy
 Kappa
 </td>
 <td style="text-align:right;">
-0.0985870
+0.0954355
 </td>
 </tr>
 <tr>
@@ -1699,7 +1700,7 @@ Kappa
 AccuracyLower
 </td>
 <td style="text-align:right;">
-0.2800276
+0.2774621
 </td>
 </tr>
 <tr>
@@ -1707,7 +1708,7 @@ AccuracyLower
 AccuracyUpper
 </td>
 <td style="text-align:right;">
-0.2955820
+0.2929747
 </td>
 </tr>
 <tr>
@@ -1715,7 +1716,7 @@ AccuracyUpper
 AccuracyNull
 </td>
 <td style="text-align:right;">
-0.3240508
+0.3245073
 </td>
 </tr>
 <tr>
@@ -1792,7 +1793,7 @@ x
 Accuracy
 </td>
 <td style="text-align:right;">
-0.3028228
+0.3024424
 </td>
 </tr>
 <tr>
@@ -1800,7 +1801,7 @@ Accuracy
 Kappa
 </td>
 <td style="text-align:right;">
-0.0930971
+0.0921491
 </td>
 </tr>
 <tr>
@@ -1808,7 +1809,7 @@ Kappa
 AccuracyLower
 </td>
 <td style="text-align:right;">
-0.2949737
+0.2945962
 </td>
 </tr>
 <tr>
@@ -1816,7 +1817,7 @@ AccuracyLower
 AccuracyUpper
 </td>
 <td style="text-align:right;">
-0.3107592
+0.3103761
 </td>
 </tr>
 <tr>
@@ -1824,7 +1825,7 @@ AccuracyUpper
 AccuracyNull
 </td>
 <td style="text-align:right;">
-0.3240508
+0.3245073
 </td>
 </tr>
 <tr>
@@ -1832,7 +1833,7 @@ AccuracyNull
 AccuracyPValue
 </td>
 <td style="text-align:right;">
-0.9999999
+1.0000000
 </td>
 </tr>
 <tr>
@@ -1889,7 +1890,7 @@ x
 Accuracy
 </td>
 <td style="text-align:right;">
-0.3059423
+0.2983337
 </td>
 </tr>
 <tr>
@@ -1897,7 +1898,7 @@ Accuracy
 Kappa
 </td>
 <td style="text-align:right;">
-0.1594843
+0.1555724
 </td>
 </tr>
 <tr>
@@ -1905,7 +1906,7 @@ Kappa
 AccuracyLower
 </td>
 <td style="text-align:right;">
-0.2980699
+0.2905190
 </td>
 </tr>
 <tr>
@@ -1913,7 +1914,7 @@ AccuracyLower
 AccuracyUpper
 </td>
 <td style="text-align:right;">
-0.3139008
+0.3062378
 </td>
 </tr>
 <tr>
@@ -1921,7 +1922,7 @@ AccuracyUpper
 AccuracyNull
 </td>
 <td style="text-align:right;">
-0.3240508
+0.3245073
 </td>
 </tr>
 <tr>
@@ -1929,7 +1930,7 @@ AccuracyNull
 AccuracyPValue
 </td>
 <td style="text-align:right;">
-0.9999960
+1.0000000
 </td>
 </tr>
 <tr>
@@ -1964,13 +1965,13 @@ eta
 <tbody>
 <tr>
 <td style="text-align:left;">
-97
+99
 </td>
 <td style="text-align:right;">
 100
 </td>
 <td style="text-align:right;">
-0.1
+0.7
 </td>
 <td style="text-align:right;">
 1
@@ -2038,22 +2039,22 @@ NA’s
 linear
 </td>
 <td style="text-align:center;">
-1.0503160
+1.0556691
 </td>
 <td style="text-align:center;">
-1.0687982
+1.0720041
 </td>
 <td style="text-align:center;">
-1.0770041
+1.0790254
 </td>
 <td style="text-align:center;">
-1.0779126
+1.0785525
 </td>
 <td style="text-align:center;">
-1.086004
+1.0842065
 </td>
 <td style="text-align:center;">
-1.1051476
+1.1022982
 </td>
 <td style="text-align:center;">
 0
@@ -2064,22 +2065,22 @@ linear
 linear\_preprocess
 </td>
 <td style="text-align:center;">
-1.1264511
+1.1323509
 </td>
 <td style="text-align:center;">
-1.1489647
+1.1518765
 </td>
 <td style="text-align:center;">
-1.1573950
+1.1578684
 </td>
 <td style="text-align:center;">
-1.1564836
+1.1588583
 </td>
 <td style="text-align:center;">
-1.164328
+1.1668567
 </td>
 <td style="text-align:center;">
-1.1842091
+1.1873037
 </td>
 <td style="text-align:center;">
 0
@@ -2090,22 +2091,22 @@ linear\_preprocess
 xgb
 </td>
 <td style="text-align:center;">
-0.8741322
+0.8634413
 </td>
 <td style="text-align:center;">
-0.8914763
+0.8896695
 </td>
 <td style="text-align:center;">
-0.8973731
+0.8973788
 </td>
 <td style="text-align:center;">
-0.8979285
+0.8968748
 </td>
 <td style="text-align:center;">
-0.905810
+0.9053025
 </td>
 <td style="text-align:center;">
-0.9298612
+0.9179304
 </td>
 <td style="text-align:center;">
 0
@@ -2149,22 +2150,22 @@ NA’s
 linear
 </td>
 <td style="text-align:center;">
-1.324775
+1.331280
 </td>
 <td style="text-align:center;">
-1.344401
+1.346354
 </td>
 <td style="text-align:center;">
-1.354436
+1.358014
 </td>
 <td style="text-align:center;">
-1.355377
+1.356810
 </td>
 <td style="text-align:center;">
-1.365470
+1.364577
 </td>
 <td style="text-align:center;">
-1.387657
+1.390386
 </td>
 <td style="text-align:center;">
 0
@@ -2175,22 +2176,22 @@ linear
 linear\_preprocess
 </td>
 <td style="text-align:center;">
-1.408171
+1.416085
 </td>
 <td style="text-align:center;">
-1.434654
+1.438848
 </td>
 <td style="text-align:center;">
-1.444064
+1.447147
 </td>
 <td style="text-align:center;">
-1.443766
+1.446982
 </td>
 <td style="text-align:center;">
-1.453226
+1.456786
 </td>
 <td style="text-align:center;">
-1.476833
+1.488679
 </td>
 <td style="text-align:center;">
 0
@@ -2201,22 +2202,22 @@ linear\_preprocess
 xgb
 </td>
 <td style="text-align:center;">
-1.107851
+1.093787
 </td>
 <td style="text-align:center;">
-1.129791
+1.131161
 </td>
 <td style="text-align:center;">
-1.138798
+1.140278
 </td>
 <td style="text-align:center;">
-1.139204
+1.139845
 </td>
 <td style="text-align:center;">
-1.148444
+1.148898
 </td>
 <td style="text-align:center;">
-1.174290
+1.178768
 </td>
 <td style="text-align:center;">
 0
@@ -2260,22 +2261,22 @@ NA’s
 linear
 </td>
 <td style="text-align:center;">
-0.2927245
+0.3024270
 </td>
 <td style="text-align:center;">
-0.3168098
+0.3176881
 </td>
 <td style="text-align:center;">
-0.3229482
+0.3233341
 </td>
 <td style="text-align:center;">
-0.3233796
+0.3235650
 </td>
 <td style="text-align:center;">
-0.3324098
+0.3298476
 </td>
 <td style="text-align:center;">
-0.3477401
+0.3444846
 </td>
 <td style="text-align:center;">
 0
@@ -2286,22 +2287,22 @@ linear
 linear\_preprocess
 </td>
 <td style="text-align:center;">
-0.2080042
+0.1988087
 </td>
 <td style="text-align:center;">
-0.2239755
+0.2243597
 </td>
 <td style="text-align:center;">
-0.2319444
+0.2307670
 </td>
 <td style="text-align:center;">
-0.2322573
+0.2306831
 </td>
 <td style="text-align:center;">
-0.2405701
+0.2374214
 </td>
 <td style="text-align:center;">
-0.2568149
+0.2500788
 </td>
 <td style="text-align:center;">
 0
@@ -2312,22 +2313,22 @@ linear\_preprocess
 xgb
 </td>
 <td style="text-align:center;">
-0.4989756
+0.4958629
 </td>
 <td style="text-align:center;">
-0.5135854
+0.5166333
 </td>
 <td style="text-align:center;">
-0.5220140
+0.5233069
 </td>
 <td style="text-align:center;">
-0.5219858
+0.5226247
 </td>
 <td style="text-align:center;">
-0.5294956
+0.5294110
 </td>
 <td style="text-align:center;">
-0.5486606
+0.5464376
 </td>
 <td style="text-align:center;">
 0

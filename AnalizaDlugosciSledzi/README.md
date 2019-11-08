@@ -28,6 +28,7 @@ Wykorzystane biblioteki
 -   `knitr`
 -   `kableExtra`
 -   `dplyr`
+-   `plotly`
 -   `tidyverse`
 -   `ggplot2`
 -   `gridExtra`
@@ -889,12 +890,13 @@ Rozkład wartości cech
 ---------------------
 
 ``` r
-ggplot(content, aes(x = length)) + geom_histogram(binwidth = 0.25) + 
-  theme_bw() + ggtitle("Długość złowionego śledzia [cm]") + 
+ggplot(content, aes(x = length)) + geom_histogram(binwidth = 0.25) +
+  theme_bw() + ggtitle("Długość złowionego śledzia [cm]") +
   xlab(sprintf("Długość [cm]")) + ylab("Liczba obserwacji")
 ```
 
 ![](Project_Herring_Analyze_files/figure-markdown_github/dlugosc%20sledzia-1.png)
+
 Jak możemy zaobserwować, większość śledzi w połowie ma długość od 23 do
 27 centymetrów. Mamy do czynienia z rozkładem bardzo zbliżonym do
 rozkładu normalnego.
@@ -905,7 +907,7 @@ plot_cfin1 <- ggplot(content, aes(x = cfin1)) + geom_histogram(binwidth = 1.0) +
   xlab(sprintf("Zagęszczenie planktonu [j]")) + ylab("Liczba obserwacji")
 
 plot_cfin2 <- ggplot(content, aes(x = cfin2)) + geom_histogram(binwidth = 1.0) +
-  theme_bw() + ggtitle("Calanus finmarchicus gat. 2") + 
+  theme_bw() + ggtitle("Calanus finmarchicus gat. 2") +
   xlab(sprintf("Zagęszczenie planktonu [j]")) + ylab("Liczba obserwacji")
 
 grid.arrange(plot_cfin1, plot_cfin2, nrow = 1)
@@ -922,11 +924,11 @@ analizie.
 
 ``` r
 plot_chel1 <- ggplot(content, aes(x = chel1)) + geom_histogram(binwidth = 0.5) +
-  theme_bw() + ggtitle("Calanus helgolandicus gat. 1") + 
+  theme_bw() + ggtitle("Calanus helgolandicus gat. 1") +
   xlab(sprintf("Zagęszczenie planktonu [j]")) + ylab("Liczba obserwacji")
 
 plot_chel2 <- ggplot(content, aes(x = chel2)) + geom_histogram(binwidth = 0.5) +
-  theme_bw() + ggtitle("Calanus helgolandicus gat. 2") + 
+  theme_bw() + ggtitle("Calanus helgolandicus gat. 2") +
   xlab(sprintf("Zagęszczenie planktonu [j]")) + ylab("Liczba obserwacji")
 
 grid.arrange(plot_chel1, plot_chel2, nrow = 1)
@@ -943,11 +945,11 @@ jednakże mniej skupiony w okolicach zera, a bardziej rozproszony
 
 ``` r
 plot_lcop1 <- ggplot(content, aes(x = lcop1)) + geom_histogram(binwidth = 0.5) +
-  theme_bw() + ggtitle("Widłonogi gat. 1") + 
+  theme_bw() + ggtitle("Widłonogi gat. 1") +
   xlab(sprintf("Zagęszczenie planktonu [j]")) + ylab("Liczba obserwacji")
 
 plot_lcop2 <- ggplot(content, aes(x = lcop2)) + geom_histogram(binwidth = 0.5) +
-  theme_bw() + ggtitle("Widłonogi gat. 2") + 
+  theme_bw() + ggtitle("Widłonogi gat. 2") +
   xlab(sprintf("Zagęszczenie planktonu [j]")) + ylab("Liczba obserwacji")
 
 grid.arrange(plot_lcop1, plot_lcop2, nrow = 1)
@@ -961,19 +963,19 @@ osiąga rozkład mniej skupiony wokół jednej wartości.
 
 ``` r
 plot_fbar <- ggplot(content, aes(x = fbar)) + geom_histogram(binwidth = 0.05) +
-  theme_bw() + ggtitle("Natężenie połowów") + 
+  theme_bw() + ggtitle("Natężenie połowów") +
   xlab(sprintf("Ułamek pozostawionego narybku")) + ylab("Liczba obserwacji")
 
 plot_recr <- ggplot(content, aes(x = recr)) + geom_histogram(binwidth = 50000.0) +
-  theme_bw() + ggtitle("Roczny narybek") + 
+  theme_bw() + ggtitle("Roczny narybek") +
   xlab(sprintf("Liczba śledzi")) + ylab("Liczba obserwacji")
 
 plot_cumf <- ggplot(content, aes(x = cumf)) + geom_histogram(binwidth = 0.02) +
-  theme_bw() + ggtitle("Łączne roczne natężenie połowów") + 
+  theme_bw() + ggtitle("Łączne roczne natężenie połowów") +
   xlab(sprintf("Ułamek pozostawionego narybku")) + ylab("Liczba obserwacji")
 
 plot_totaln <- ggplot(content, aes(x = totaln)) + geom_histogram(binwidth = 1000.0) +
-  theme_bw() + ggtitle("Łączna liczba złowionych ryb") + 
+  theme_bw() + ggtitle("Łączna liczba złowionych ryb") +
   xlab(sprintf("Liczba śledzi")) + ylab("Liczba obserwacji")
 
 grid.arrange(plot_fbar, plot_recr, plot_cumf, plot_totaln, nrow = 2)
@@ -983,19 +985,19 @@ grid.arrange(plot_fbar, plot_recr, plot_cumf, plot_totaln, nrow = 2)
 
 ``` r
 plot_sst <- ggplot(content, aes(x = sst)) + geom_histogram(binwidth = 0.1) +
-  theme_bw() + ggtitle("Temperatura przy powierzchni wody") + 
+  theme_bw() + ggtitle("Temperatura przy powierzchni wody") +
   xlab(sprintf("Temperatura")) + ylab("Liczba obserwacji")
 
 plot_sal <- ggplot(content, aes(x = sal)) + geom_histogram(binwidth = 0.01) +
-  theme_bw() + ggtitle("Poziom zasolenia wody") + 
+  theme_bw() + ggtitle("Poziom zasolenia wody") +
   xlab(sprintf("Zasolenie wody")) + ylab("Liczba obserwacji")
 
 plot_xmonth <- ggplot(content, aes(x = xmonth)) + geom_histogram(binwidth = 0.5) +
-  theme_bw() + ggtitle("Miesic połowu") + 
+  theme_bw() + ggtitle("Miesic połowu") +
   xlab(sprintf("Miesiąc")) + ylab("Liczba obserwacji")
 
 plot_nao <- ggplot(content, aes(x = nao)) + geom_histogram(binwidth = 0.5) +
-  theme_bw() + ggtitle("Oscylacja północnoatlantycka") + 
+  theme_bw() + ggtitle("Oscylacja północnoatlantycka") +
   xlab(sprintf("Oscylacja")) + ylab("Liczba obserwacji")
 
 grid.arrange(plot_sst, plot_sal, plot_xmonth, plot_nao, nrow = 2)
@@ -1540,32 +1542,23 @@ Długość śledzi
 --------------
 
 ``` r
-ggplot(sampled_data, aes(x=id, y=length)) + theme_bw() + geom_point() +
+plot_zmiana_rozmiaru <- ggplot(sampled_data, aes(x=id, y=length)) + theme_bw() + geom_point() +
   theme(axis.text.x=element_blank()) + ylab("Długość [cm]") + xlab("Zmiana w czasie") +
   geom_smooth(method = "loess", formula = y ~ x, se = FALSE, colour = "#f5ad00",
               size = 1.0) + ggtitle("Zmiana długości śledzia") +
   geom_vline(xintercept = 17000, colour="blue", linetype = 2, size = 1.0)
+
+ggplotly(plot_zmiana_rozmiaru)
 ```
 
 ![](Project_Herring_Analyze_files/figure-markdown_github/dlugosc%20sledzi%20zmiana-1.png)
 
 Z wykresu przestawiającego zmianę długości śledzi w czasie, możemy
 zaobserwować odwrócenie tendencji. Na początku rozmiar wzrastał z około
-`24,5 cm` do `26 cm` aby następnie spaść poniżej `23,5 cm`. Za pomocą
+`24,5 cm` do `26 cm`, aby następnie spaść poniżej `23,5 cm`. Za pomocą
 niebieskiej linii oznaczono punkt przed rozpoczęciem spadku. Moment w
 czasie (na podstawie historii obserwacji) zostanie wykorzystany jako
 punkt referencyjny w kolejnych wykresach.
-
-``` r
-ggplot(
-  sampled_data,
-  group = xmonth,
-  aes(x=id, y=length)
-) + theme_bw() + 
-  geom_line() + transition_reveal(id)
-```
-
-TODO: W MD i HTML animacja, w PDF bez
 
 Dostępność pokarmu
 ------------------
@@ -1691,7 +1684,7 @@ x
 Accuracy
 </td>
 <td style="text-align:right;">
-0.2877577
+0.2851708
 </td>
 </tr>
 <tr>
@@ -1699,7 +1692,7 @@ Accuracy
 Kappa
 </td>
 <td style="text-align:right;">
-0.0985870
+0.0954355
 </td>
 </tr>
 <tr>
@@ -1707,7 +1700,7 @@ Kappa
 AccuracyLower
 </td>
 <td style="text-align:right;">
-0.2800276
+0.2774621
 </td>
 </tr>
 <tr>
@@ -1715,7 +1708,7 @@ AccuracyLower
 AccuracyUpper
 </td>
 <td style="text-align:right;">
-0.2955820
+0.2929747
 </td>
 </tr>
 <tr>
@@ -1723,7 +1716,7 @@ AccuracyUpper
 AccuracyNull
 </td>
 <td style="text-align:right;">
-0.3240508
+0.3245073
 </td>
 </tr>
 <tr>
@@ -1744,7 +1737,8 @@ NaN
 </tr>
 </tbody>
 </table>
-![](Project_Herring_Analyze_files/figure-markdown_github/wyniki-lm-1.png)
+
+![](Project_Herring_Analyze_files/figure-markdown_github/wyniki%20lm%20ggplot-1.png)
 
 W ramach eksperymentu, jako zbiór danych zastosujemy oryginalny zbiór
 danych z pominięciem charakterystyk dotyczących połowu na łowiskach:
@@ -1771,7 +1765,7 @@ danych z pominięciem charakterystyk dotyczących połowu na łowiskach:
 model_linear_preproc <- train(length ~ ., data = trainingSet[, -c(8:11)],
                                  method = "lm", trControl = ctrl)
 
-predicted_linear_preproc <- 
+predicted_linear_preproc <-
   model_linear_preproc %>%
   predict(newdata = testSet[, -c(8:11)]) %>%
   sapply(round, digits = 0)
@@ -1799,7 +1793,7 @@ x
 Accuracy
 </td>
 <td style="text-align:right;">
-0.3028228
+0.3024424
 </td>
 </tr>
 <tr>
@@ -1807,7 +1801,7 @@ Accuracy
 Kappa
 </td>
 <td style="text-align:right;">
-0.0930971
+0.0921491
 </td>
 </tr>
 <tr>
@@ -1815,7 +1809,7 @@ Kappa
 AccuracyLower
 </td>
 <td style="text-align:right;">
-0.2949737
+0.2945962
 </td>
 </tr>
 <tr>
@@ -1823,7 +1817,7 @@ AccuracyLower
 AccuracyUpper
 </td>
 <td style="text-align:right;">
-0.3107592
+0.3103761
 </td>
 </tr>
 <tr>
@@ -1831,7 +1825,7 @@ AccuracyUpper
 AccuracyNull
 </td>
 <td style="text-align:right;">
-0.3240508
+0.3245073
 </td>
 </tr>
 <tr>
@@ -1839,7 +1833,7 @@ AccuracyNull
 AccuracyPValue
 </td>
 <td style="text-align:right;">
-0.9999999
+1.0000000
 </td>
 </tr>
 <tr>
@@ -1852,7 +1846,8 @@ NaN
 </tr>
 </tbody>
 </table>
-![](Project_Herring_Analyze_files/figure-markdown_github/wyniki-lm-selected-1.png)
+
+![](Project_Herring_Analyze_files/figure-markdown_github/wyniki-lm-selected-wykres-1.png)
 
 Ostatnim modelem będzie `eXtreme Gradient Boosting`. W ramach uczenia
 zastosujemy macierz parametrów.
@@ -1895,7 +1890,7 @@ x
 Accuracy
 </td>
 <td style="text-align:right;">
-0.3059423
+0.2983337
 </td>
 </tr>
 <tr>
@@ -1903,7 +1898,7 @@ Accuracy
 Kappa
 </td>
 <td style="text-align:right;">
-0.1594843
+0.1555724
 </td>
 </tr>
 <tr>
@@ -1911,7 +1906,7 @@ Kappa
 AccuracyLower
 </td>
 <td style="text-align:right;">
-0.2980699
+0.2905190
 </td>
 </tr>
 <tr>
@@ -1919,7 +1914,7 @@ AccuracyLower
 AccuracyUpper
 </td>
 <td style="text-align:right;">
-0.3139008
+0.3062378
 </td>
 </tr>
 <tr>
@@ -1927,7 +1922,7 @@ AccuracyUpper
 AccuracyNull
 </td>
 <td style="text-align:right;">
-0.3240508
+0.3245073
 </td>
 </tr>
 <tr>
@@ -1935,7 +1930,7 @@ AccuracyNull
 AccuracyPValue
 </td>
 <td style="text-align:right;">
-0.9999960
+1.0000000
 </td>
 </tr>
 <tr>
@@ -1970,13 +1965,13 @@ eta
 <tbody>
 <tr>
 <td style="text-align:left;">
-97
+99
 </td>
 <td style="text-align:right;">
 100
 </td>
 <td style="text-align:right;">
-0.1
+0.7
 </td>
 <td style="text-align:right;">
 1
@@ -1987,13 +1982,14 @@ eta
 </tr>
 </tbody>
 </table>
-![](Project_Herring_Analyze_files/figure-markdown_github/wyniki%20xgb-1.png)
+
+![](Project_Herring_Analyze_files/figure-markdown_github/wyniki%20xgb%20ggplot-1.png)
 
 Porównanie modeli
 -----------------
 
 ``` r
-resampled_models <- 
+resampled_models <-
   list(linear = model_linear_regression,
        linear_preprocess = model_linear_preproc,
        xgb = model_xgb) %>% resamples()
@@ -2043,22 +2039,22 @@ NA’s
 linear
 </td>
 <td style="text-align:center;">
-1.0503160
+1.0556691
 </td>
 <td style="text-align:center;">
-1.0687982
+1.0720041
 </td>
 <td style="text-align:center;">
-1.0770041
+1.0790254
 </td>
 <td style="text-align:center;">
-1.0779126
+1.0785525
 </td>
 <td style="text-align:center;">
-1.086004
+1.0842065
 </td>
 <td style="text-align:center;">
-1.1051476
+1.1022982
 </td>
 <td style="text-align:center;">
 0
@@ -2069,22 +2065,22 @@ linear
 linear\_preprocess
 </td>
 <td style="text-align:center;">
-1.1264511
+1.1323509
 </td>
 <td style="text-align:center;">
-1.1489647
+1.1518765
 </td>
 <td style="text-align:center;">
-1.1573950
+1.1578684
 </td>
 <td style="text-align:center;">
-1.1564836
+1.1588583
 </td>
 <td style="text-align:center;">
-1.164328
+1.1668567
 </td>
 <td style="text-align:center;">
-1.1842091
+1.1873037
 </td>
 <td style="text-align:center;">
 0
@@ -2095,22 +2091,22 @@ linear\_preprocess
 xgb
 </td>
 <td style="text-align:center;">
-0.8741322
+0.8634413
 </td>
 <td style="text-align:center;">
-0.8914763
+0.8896695
 </td>
 <td style="text-align:center;">
-0.8973731
+0.8973788
 </td>
 <td style="text-align:center;">
-0.8979285
+0.8968748
 </td>
 <td style="text-align:center;">
-0.905810
+0.9053025
 </td>
 <td style="text-align:center;">
-0.9298612
+0.9179304
 </td>
 <td style="text-align:center;">
 0
@@ -2154,22 +2150,22 @@ NA’s
 linear
 </td>
 <td style="text-align:center;">
-1.324775
+1.331280
 </td>
 <td style="text-align:center;">
-1.344401
+1.346354
 </td>
 <td style="text-align:center;">
-1.354436
+1.358014
 </td>
 <td style="text-align:center;">
-1.355377
+1.356810
 </td>
 <td style="text-align:center;">
-1.365470
+1.364577
 </td>
 <td style="text-align:center;">
-1.387657
+1.390386
 </td>
 <td style="text-align:center;">
 0
@@ -2180,22 +2176,22 @@ linear
 linear\_preprocess
 </td>
 <td style="text-align:center;">
-1.408171
+1.416085
 </td>
 <td style="text-align:center;">
-1.434654
+1.438848
 </td>
 <td style="text-align:center;">
-1.444064
+1.447147
 </td>
 <td style="text-align:center;">
-1.443766
+1.446982
 </td>
 <td style="text-align:center;">
-1.453226
+1.456786
 </td>
 <td style="text-align:center;">
-1.476833
+1.488679
 </td>
 <td style="text-align:center;">
 0
@@ -2206,22 +2202,22 @@ linear\_preprocess
 xgb
 </td>
 <td style="text-align:center;">
-1.107851
+1.093787
 </td>
 <td style="text-align:center;">
-1.129791
+1.131161
 </td>
 <td style="text-align:center;">
-1.138798
+1.140278
 </td>
 <td style="text-align:center;">
-1.139204
+1.139845
 </td>
 <td style="text-align:center;">
-1.148444
+1.148898
 </td>
 <td style="text-align:center;">
-1.174290
+1.178768
 </td>
 <td style="text-align:center;">
 0
@@ -2265,22 +2261,22 @@ NA’s
 linear
 </td>
 <td style="text-align:center;">
-0.2927245
+0.3024270
 </td>
 <td style="text-align:center;">
-0.3168098
+0.3176881
 </td>
 <td style="text-align:center;">
-0.3229482
+0.3233341
 </td>
 <td style="text-align:center;">
-0.3233796
+0.3235650
 </td>
 <td style="text-align:center;">
-0.3324098
+0.3298476
 </td>
 <td style="text-align:center;">
-0.3477401
+0.3444846
 </td>
 <td style="text-align:center;">
 0
@@ -2291,22 +2287,22 @@ linear
 linear\_preprocess
 </td>
 <td style="text-align:center;">
-0.2080042
+0.1988087
 </td>
 <td style="text-align:center;">
-0.2239755
+0.2243597
 </td>
 <td style="text-align:center;">
-0.2319444
+0.2307670
 </td>
 <td style="text-align:center;">
-0.2322573
+0.2306831
 </td>
 <td style="text-align:center;">
-0.2405701
+0.2374214
 </td>
 <td style="text-align:center;">
-0.2568149
+0.2500788
 </td>
 <td style="text-align:center;">
 0
@@ -2317,22 +2313,22 @@ linear\_preprocess
 xgb
 </td>
 <td style="text-align:center;">
-0.4989756
+0.4958629
 </td>
 <td style="text-align:center;">
-0.5135854
+0.5166333
 </td>
 <td style="text-align:center;">
-0.5220140
+0.5233069
 </td>
 <td style="text-align:center;">
-0.5219858
+0.5226247
 </td>
 <td style="text-align:center;">
-0.5294956
+0.5294110
 </td>
 <td style="text-align:center;">
-0.5486606
+0.5464376
 </td>
 <td style="text-align:center;">
 0
@@ -2344,11 +2340,12 @@ xgb
 </tr>
 </tbody>
 </table>
+
 ``` r
 dotplot(resampled_models, metric = "RMSE")
 ```
 
-![](Project_Herring_Analyze_files/figure-markdown_github/porownanie%20modeli-1.png)
+![](Project_Herring_Analyze_files/figure-markdown_github/porownanie%20modeli%20dotplot-1.png)
 
 Do porównania regresorów użyto miary `RMSE`, której im mniejsza wartość,
 tym lepiej. Najlepszym z regresorów okazał się `xgbLinear`. Biorąc pod
